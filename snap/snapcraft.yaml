@@ -10,9 +10,19 @@ confinement: devmode # use 'strict' once you have the right plugs and slots
 
 apps:
   sync:
-    command: python sync.py
+    command: wrappers/sync
 
 parts:
-  server:
-    source: .
+  supertpv-branch-server:
     plugin: python
+    source: .
+    python-version: python3
+    #requirements: requirements.txt
+    #stage-packages: [gir1.2-gtk-3.0, python3-gi]
+    install: |
+      mkdir -p $SNAPCRAFT_PART_INSTALL/app
+      cp -r ./* $SNAPCRAFT_PART_INSTALL/app/
+
+  wrappers:
+    plugin: dump
+    source: snap_wrap/
