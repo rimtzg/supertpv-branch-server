@@ -5,8 +5,8 @@ summary: Bracnh server for SuperTPV
 description: |
   Bracnh server for SuperTPV
 
-grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
 
 apps:
   sync:
@@ -17,7 +17,7 @@ parts:
     plugin: python
     source: .
     python-version: python3
-    #requirements: requirements.txt
+    requirements: requirements.txt
     #stage-packages: [gir1.2-gtk-3.0, python3-gi]
     install: |
       mkdir -p $SNAPCRAFT_PART_INSTALL/app
