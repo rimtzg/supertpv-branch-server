@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>Configuration</h2>
+    {% if session.logged_in %}
+        <form action="{{ url_for('config.save') }}" method=POST class=save>
+            <h3>API Server</h3>
+            <dt>URL:</dt>
+            <dd><input type=text size=40 name=api_url value={{ config.API.URL }}></dd>
+            <dt>Account:</dt>
+            <dd><input type=text size=40 name=api_account value={{ config.API.ACCOUNT }}></dd>
+            <dt>Username:</dt>
+            <dd><input type=text size=40 name=api_username value={{ config.API.USERNAME }}></dd>
+            <dt>Password:</dt>
+            <dd><input type=text size=40 name=api_password value={{ config.API.PASSWORD }}></dd>
+            <dt>Delay Time (seconds):</dt>
+            <dd><input type=number size=40 name=api_delay value={{ config.API.DELAY }}></dd>
+            
+            <h3>Local Server</h3>
+            <dt>Username:</dt>
+            <dd><input type=text size=40 name=server_username value={{ config.SERVER.USERNAME }}></dd>
+            <dt>Password:</dt>
+            <dd><input type=text size=40 name=server_password value={{ config.SERVER.PASSWORD }}></dd>
+            <dt>Secret Key:</dt>
+            <dd><input type=text size=40 name=server_secret_key value={{ config.SERVER.SECRET_KEY }}></dd>
+
+            <h3>Application</h3>
+            <dt>Debug:</dt>
+            <dd>
+                <input type="radio" name="app_debug" value="true"
+                    {% if config.APP.DEBUG == "true" %}
+                    {{ "checked" }}
+                    {% endif %}
+                />Yes<br />
+                <input type="radio" name="app_debug" value="false"
+                    {% if config.APP.DEBUG == "false" %}
+                    {{ "checked" }}
+                    {% endif %}
+                />No<br />
+            </dd>
+
+            <h3>Data Base</h3>
+            <dt>URL:</dt>
+            <dd><input type=text size=40 name=db_url value={{ config.DATABASE.URL }}></dd>
+            <dt>Port:</dt>
+            <dd><input type=number size=40 name=db_port value={{ config.DATABASE.PORT }}></dd>
+            <dt>Username:</dt>
+            <dd><input type=text size=40 name=db_username value={{ config.DATABASE.USERNAME }}></dd>
+            <dt>Password:</dt>
+            <dd><input type=password size=40 name=db_password value={{ config.DATABASE.PASSWORD }}></dd>
+
+            <br />
+            <input type=submit value=Save>
+        </form>
+    {% else %}
+        <em>You must be logged in.</em>
+    {% endif %}
+{% endblock %}

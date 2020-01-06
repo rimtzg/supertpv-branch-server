@@ -1,0 +1,24 @@
+<!doctype html>
+<title>SuperTPV Printer Server</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+  <h1><a href="{{ url_for('home') }}">SuperTPV Branch Server</a></h1>
+  <br />
+  <a href="{{ url_for('home') }}">Ticket printers</a> - 
+  <a href="{{ url_for('home') }}">Label printers</a> - 
+  <a href="{{ url_for('home') }}">Templates</a> - 
+  <a href="{{ url_for('config.home') }}">Configuration</a>
+  <div class=metanav>
+  {% if not session.logged_in %}
+    <a href="{{ url_for('admin.login') }}">log in</a>
+  {% else %}
+    <a href="{{ url_for('admin.logout') }}">log out</a>
+  {% endif %}
+  </div>
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}
+
+  {% endblock %}
+</div>
