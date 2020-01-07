@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+
+cp -n $SNAP/app/gunicorn.cfg $SNAP_COMMON/gunicorn.cfg
+cp -n $SNAP/app/app_config.ini $SNAP_COMMON/app_config.ini
+
+exec "$SNAP/bin/gunicorn" --chdir "$SNAP/app" --config "$SNAP_COMMON/gunicorn.cfg" wsgi:app "$@"

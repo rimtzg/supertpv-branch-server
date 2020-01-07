@@ -9,8 +9,10 @@ grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict # use 'strict' once you have the right plugs and slots
 
 apps:
-  sync:
-    command: wrappers/sync
+  server:
+    command: wrappers/run
+    daemon: simple
+    plugs: [network, network-bind]
 
 parts:
   supertpv-branch-server:
