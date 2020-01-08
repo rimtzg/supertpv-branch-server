@@ -20,7 +20,8 @@ parts:
     source: .
     python-version: python3
     requirements: requirements.txt
-    stage-packages: [mongodb]
+    stage-packages:
+      - mongodb-server
     install: |
       mkdir -p $SNAPCRAFT_PART_INSTALL/app
       cp -r ./* $SNAPCRAFT_PART_INSTALL/app/
