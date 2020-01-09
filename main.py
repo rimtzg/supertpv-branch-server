@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from flask_httpauth import HTTPBasicAuth
 
 from config import app_config
+from sync import Sync
 
 from routes.config import app as config
 from routes.admin import app as admin
@@ -15,16 +16,6 @@ from routes.admin import app as admin
 DEBUG = app_config['APP']['DEBUG']
 SECRET_KEY = app_config['SERVER']['SECRET_KEY']
 
-API_URL = app_config['API']['URL']
-API_ACCOUNT = app_config['API']['ACCOUNT']
-API_USERNAME = app_config['API']['USERNAME']
-API_PASSWORD = app_config['API']['PASSWORD']
-
-DB_URL = app_config['DATABASE']['URL']
-DB_PORT = app_config['DATABASE']['PORT']
-DB_USERNAME = app_config['DATABASE']['USERNAME']
-DB_PASSWORD = app_config['DATABASE']['PASSWORD']
-
 ########################################################################
 #                                                                      #
 #                                 INIT                                 #
@@ -33,7 +24,7 @@ DB_PASSWORD = app_config['DATABASE']['PASSWORD']
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
-app.secret_key = SECRET_KEY
+app.config['SECRET_KEY'] = SECRET_KEY
 
 ########################################################################
 #                                                                      #
@@ -54,7 +45,7 @@ app.register_blueprint(admin)
 def first_start():
     #if not (os.path.isfile( app.conf['DATABASE'] )):
     #init_db()
-    #start_sync()
+    Sync().get_products()
     #start_sync()
     pass
 
