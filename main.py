@@ -3,6 +3,7 @@ from flask_httpauth import HTTPBasicAuth
 import datetime
 import threading
 from time import sleep
+import logging
 
 from config import app_config
 from sync import Sync
@@ -28,6 +29,8 @@ SECRET_KEY = app_config['SERVER']['SECRET_KEY']
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 app.config['SECRET_KEY'] = SECRET_KEY
+
+logging.basicConfig(level=logging.DEBUG)
 
 ########################################################################
 #                                                                      #

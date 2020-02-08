@@ -3,6 +3,7 @@ import json
 import requests
 import datetime
 from bson.objectid import ObjectId
+import logging
 
 from config import app_config, save_config_file
 from driver import database as db
@@ -49,14 +50,14 @@ class Sync:
         }
 
         response = requests.get(url, headers=headers)
-        print(url)
+        logging.info(url)
 
         if(response):
             if(response.status_code == requests.codes.ok):
                 db.products.delete_many({})
 
                 products = json.loads(response.text)
-                print(len(products))
+                logging.info(len(products))
 
                 for product in products:
                     db.products.insert(schema_product.validate(product))
@@ -66,13 +67,13 @@ class Sync:
                 url = API_URL + '/business/{}/products/?active=true'.format( business )
 
                 response = requests.get(url, headers=headers)
-                print(url)
+                logging.info(url)
 
                 if(response):
                     if(response.status_code == requests.codes.ok):
 
                         products = json.loads(response.text)
-                        print(len(products))
+                        logging.info(len(products))
 
                         for product in products:
                             _id = ObjectId( product['product'] )
@@ -88,7 +89,7 @@ class Sync:
         date = app_config['API']['LAST_UPDATED']
 
         url = API_URL + '/products/?active=true&date={}'.format(date)
-        print(url)
+        logging.info(url)
 
         headers = {
             'Token' : self.token
