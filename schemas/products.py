@@ -28,6 +28,25 @@ schema = Schema({
     Optional('points', default=0) : Use(int),
     Optional('stock_min', default=0) : Use(int),
     Optional('sale_min', default=0) : Use(float),
+
+    #'modified' : Use(datetime),
+}, ignore_extra_keys=True)
+
+changes_schema = Schema({
+    'cost' : Use(float),
+    Optional('profit', default=20) : Use(int),
+    'price' : Use(float),
+    Optional('promotion', default='') : Use(str.lower),
+    Optional('charge', default='') : Use(str.lower),
+    Optional('scale', default=False) : Use(bool),
+    Optional('active', default=True) : Use(bool),
+    Optional('visible', default=True) : Use(bool),
+    Optional('percent_points', default=0) : Use(int),
+    Optional('points', default=0) : Use(int),
+    Optional('stock_min', default=0) : Use(int),
+    Optional('sale_min', default=0) : Use(float),
+
+    #'modified' : Use(datetime),
 }, ignore_extra_keys=True)
 
 modify_schema = Schema({

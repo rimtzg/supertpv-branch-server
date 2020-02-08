@@ -1,5 +1,8 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, g, session
 from flask_httpauth import HTTPBasicAuth
+import datetime
+import threading
+from time import sleep
 
 from config import app_config
 from sync import Sync
@@ -41,12 +44,19 @@ app.register_blueprint(admin)
 #                                                                      #
 ########################################################################
 
+def get_updated_products():
+    with app.app_context():
+        while True:
+            Sync().get_updated_products()
+            sleep(int(app_config['API']['DELAY']))
+
 @app.before_first_request
 def first_start():
-    #if not (os.path.isfile( app.conf['DATABASE'] )):
-    #init_db()
-    Sync().get_products()
-    #start_sync()
+    Sync().get_all_products()
+
+    thread = threading.Thread(target=get_updated_products)
+    thread.start()
+
     pass
 
 ########################################################################
