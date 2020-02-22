@@ -79,8 +79,26 @@ class Sync:
                             _id = ObjectId( product['product'] )
                             db.products.update({'_id' : _id }, {'$set' : changes_schema_product.validate(product)} )
 
-                        app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
-                        save_config_file()
+                        business = app_config['API']['BUSINESS']
+                        branch = app_config['API']['BRANCH']
+
+                        url = API_URL + '/business/{}/branch/{}/products/?active=true'.format( business, branch )
+
+                        response = requests.get(url, headers=headers)
+                        logging.info(url)
+
+                        if(response):
+                            if(response.status_code == requests.codes.ok):
+
+                                products = json.loads(response.text)
+                                logging.info(len(products))
+
+                                for product in products:
+                                    _id = ObjectId( product['product'] )
+                                    db.products.update({'_id' : _id }, {'$set' : changes_schema_product.validate(product)} )
+
+                                app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
+                                save_config_file()
 
     def get_updated_products(self):
         if not(self.token):
