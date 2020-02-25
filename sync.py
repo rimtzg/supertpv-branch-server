@@ -1,4 +1,5 @@
 from flask import session
+from flask_script import Server
 import json
 import requests
 import datetime
@@ -7,31 +8,45 @@ import logging
 
 from config import app_config, save_config_file
 from driver import database as db
+from time import sleep
+import threading
 
 from schemas.products import schema as schema_product
 from schemas.products import changes_schema as changes_schema_product
 from schemas.categories import schema as schema_category
 
-API_URL      = app_config['API']['URL']
-API_ACCOUNT  = app_config['API']['ACCOUNT']
-API_USERNAME = app_config['API']['USERNAME']
-API_PASSWORD = app_config['API']['PASSWORD']
-API_DELAY    = app_config['API']['DELAY']
-
-class Sync:
+class Sync(Server):
     def __init__(self):
         self.token = None
+        self.login()
+
+        self.get_products()
+
+        def get_updated_products():
+            while True:
+                self.login()
+
+                date = app_config['API']['LAST_UPDATED']
+                self.get_products(date)
+                
+                sleep(int(app_config['API']['DELAY']))
+
+        thread = threading.Thread(target=get_updated_products)
+        thread.start()
 
     def login(self):
-        url = API_URL + '/token'
+        url = app_config['API']['URL'] + '/token'
 
         headers = {
-            'Account'  : API_ACCOUNT,
-            'Username' : API_USERNAME,
-            'Password' : API_PASSWORD,
+            'Account'  : app_config['API']['ACCOUNT'],
+            'Username' : app_config['API']['USERNAME'],
+            'Password' : app_config['API']['PASSWORD'],
         }
 
-        response = requests.get(url, headers=headers)
+        try:
+            response = requests.get(url, headers=headers)
+        except:
+            response = None
 
         if(response):
             if(response.status_code == requests.codes.ok):
@@ -44,16 +59,19 @@ class Sync:
             self.login()
 
         if not(date):
-            url = API_URL + '/products/?active=true'
+            url = app_config['API']['URL'] + '/products/?active=true'
         else:
-            url = API_URL + '/products/?active=true&date={}'.format(date)
+            url = app_config['API']['URL'] + '/products/?active=true&date={}'.format(date)
         logging.info(url)
 
         headers = {
             'Token' : self.token
         }
 
-        response = requests.get(url, headers=headers)
+        try:
+            response = requests.get(url, headers=headers)
+        except:
+            response = None
         logging.info(url)
 
         if(response):
@@ -70,11 +88,14 @@ class Sync:
                 #GET PRODUCTS FROM BUSINESS
                 business = app_config['API']['BUSINESS']
                 if not(date):
-                    url = API_URL + '/business/{}/products/?active=true'.format( business )
+                    url = app_config['API']['URL'] + '/business/{}/products/?active=true'.format( business )
                 else:
-                    url = API_URL + '/business/{}/products/?active=true&date={}'.format( business, date )
+                    url = app_config['API']['URL'] + '/business/{}/products/?active=true&date={}'.format( business, date )
 
-                response = requests.get(url, headers=headers)
+                try:
+                    response = requests.get(url, headers=headers)
+                except:
+                    response = None
                 logging.info(url)
 
                 if(response):
@@ -91,11 +112,14 @@ class Sync:
                         branch = app_config['API']['BRANCH']
 
                         if not(date):
-                            url = API_URL + '/business/{}/branch/{}/products/?active=true'.format( business, branch )
+                            url = app_config['API']['URL'] + '/business/{}/branch/{}/products/?active=true'.format( business, branch )
                         else:
-                            url = API_URL + '/business/{}/branch/{}/products/?active=true&date={}'.format( business, branch, date )
+                            url = app_config['API']['URL'] + '/business/{}/branch/{}/products/?active=true&date={}'.format( business, branch, date )
 
-                        response = requests.get(url, headers=headers)
+                        try:
+                            response = requests.get(url, headers=headers)
+                        except:
+                            response = None
                         logging.info(url)
 
                         if(response):

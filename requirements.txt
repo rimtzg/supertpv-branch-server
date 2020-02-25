@@ -4,3 +4,4 @@ requests
 pymongo
 schema
 gunicorn
+flask_script
