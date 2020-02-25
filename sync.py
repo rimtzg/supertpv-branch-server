@@ -39,11 +39,15 @@ class Sync:
 
                 self.token = data['token']
 
-    def get_all_products(self):
+    def get_products(self, date=None):
         if not(self.token):
             self.login()
 
-        url = API_URL + '/products/?active=true'
+        if not(date):
+            url = API_URL + '/products/?active=true'
+        else:
+            url = API_URL + '/products/?active=true&date={}'.format(date)
+        logging.info(url)
 
         headers = {
             'Token' : self.token
@@ -54,17 +58,21 @@ class Sync:
 
         if(response):
             if(response.status_code == requests.codes.ok):
-                db.products.delete_many({})
+                if not (date):
+                    db.products.delete_many({})
 
-                products = json.loads(response.text)
-                logging.info(len(products))
+                    products = json.loads(response.text)
+                    logging.info(len(products))
 
-                for product in products:
-                    db.products.insert(schema_product.validate(product))
+                    for product in products:
+                        db.products.insert(schema_product.validate(product))
 
                 #GET PRODUCTS FROM BUSINESS
                 business = app_config['API']['BUSINESS']
-                url = API_URL + '/business/{}/products/?active=true'.format( business )
+                if not(date):
+                    url = API_URL + '/business/{}/products/?active=true'.format( business )
+                else:
+                    url = API_URL + '/business/{}/products/?active=true&date={}'.format( business, date )
 
                 response = requests.get(url, headers=headers)
                 logging.info(url)
@@ -82,7 +90,10 @@ class Sync:
                         business = app_config['API']['BUSINESS']
                         branch = app_config['API']['BRANCH']
 
-                        url = API_URL + '/business/{}/branch/{}/products/?active=true'.format( business, branch )
+                        if not(date):
+                            url = API_URL + '/business/{}/branch/{}/products/?active=true'.format( business, branch )
+                        else:
+                            url = API_URL + '/business/{}/branch/{}/products/?active=true&date={}'.format( business, branch, date )
 
                         response = requests.get(url, headers=headers)
                         logging.info(url)
@@ -99,36 +110,6 @@ class Sync:
 
                                 app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
                                 save_config_file()
-
-    def get_updated_products(self):
-        if not(self.token):
-            self.login()
-            
-        date = app_config['API']['LAST_UPDATED']
-
-        url = API_URL + '/products/?active=true&date={}'.format(date)
-        logging.info(url)
-
-        headers = {
-            'Token' : self.token
-        }
-
-        response = requests.get(url, headers=headers)
-
-        if(response):
-            if(response.status_code == requests.codes.ok):
-
-                products = json.loads(response.text)
-
-                print(len(products))
-                for product in products:
-                    product = schema_product.validate(product)
-                    db.products.find_one_and_update({'_id' : product['_id']}, {'$set' : product})
-
-                app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
-                save_config_file()
-
-
 
 
 

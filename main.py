@@ -47,18 +47,12 @@ app.register_blueprint(admin)
 #                                                                      #
 ########################################################################
 
-def get_updated_products():
-    with app.app_context():
-        while True:
-            Sync().get_updated_products()
-            sleep(int(app_config['API']['DELAY']))
-
 @app.before_first_request
 def first_start():
-    Sync().get_all_products()
+    # Sync().get_all_products()
 
-    thread = threading.Thread(target=get_updated_products)
-    thread.start()
+    # thread = threading.Thread(target=get_updated_products)
+    # thread.start()
 
     pass
 
@@ -78,5 +72,17 @@ def home():
 #                                                                      #
 ########################################################################
 
+def get_updated_products():
+    while True:
+        date = app_config['API']['LAST_UPDATED']
+        Sync().get_products(date)
+        
+        sleep(int(app_config['API']['DELAY']))
+
 if __name__ == '__main__':
+    Sync().get_products()
+
+    thread = threading.Thread(target=get_updated_products)
+    thread.start()
+    
     app.run(host='0.0.0.0', port=3001, debug=DEBUG )
