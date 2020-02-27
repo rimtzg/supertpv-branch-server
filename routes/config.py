@@ -21,6 +21,8 @@ def save():
     app_config['API']['ACCOUNT']        = request.form['api_account']
     app_config['API']['USERNAME']       = request.form['api_username']
     app_config['API']['PASSWORD']       = request.form['api_password']
+    app_config['API']['BUSINESS']       = request.form['api_business']
+    app_config['API']['BRANCH']         = request.form['api_branch']
     app_config['API']['DELAY']          = request.form['api_delay']
 
     app_config['SERVER']['USERNAME']    = request.form['server_username']
