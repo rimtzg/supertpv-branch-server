@@ -5,11 +5,11 @@ import requests
 import datetime
 from bson.objectid import ObjectId
 import logging
-
-from config import app_config, save_config_file
-from driver import database as db
 from time import sleep
 import threading
+
+from config import app_config, save_config_file
+from driver import Driver
 
 from schemas.products import schema as schema_product
 from schemas.products import changes_schema as changes_schema_product
@@ -18,10 +18,23 @@ from schemas.categories import schema as schema_category
 class Sync(Server):
     def __init__(self):
         self.token = None
-        self.login()
+        # self.login()
 
-        self.get_products()
+        # self.get_products()
 
+        # def get_updated_products():
+        #     while True:
+        #         self.login()
+
+        #         date = app_config['API']['LAST_UPDATED']
+        #         self.get_products(date)
+                
+        #         sleep(int(app_config['API']['DELAY']))
+
+        # thread = threading.Thread(target=get_updated_products)
+        # thread.start()
+
+    def get_updated_products(self):
         def get_updated_products():
             while True:
                 self.login()
@@ -55,6 +68,8 @@ class Sync(Server):
                 self.token = data['token']
 
     def get_products(self, date=None):
+        db = Driver().database()
+
         if not(self.token):
             self.login()
 

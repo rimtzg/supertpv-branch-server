@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, session, request, abort, flash, redirect, url_for
 from config import app_config, save_config_file
 
+from sync import Sync
+
 PREFIX = 'config'
 
 app = Blueprint(PREFIX, __name__, url_prefix='/'+PREFIX)
@@ -28,6 +30,7 @@ def save():
     app_config['APP']['DEBUG']          = request.form['app_debug']
 
     app_config['DATABASE']['URL']       = request.form['db_url']
+    app_config['DATABASE']['NAME']       = request.form['db_name']
     app_config['DATABASE']['PORT']      = request.form['db_port']
     app_config['DATABASE']['USERNAME']  = request.form['db_username']
     app_config['DATABASE']['PASSWORD']  = request.form['db_password']
@@ -36,3 +39,11 @@ def save():
 
     flash('Configuration was successfully saved')
     return redirect(url_for('home'))
+
+@app.route('/sync', methods=['POST'])
+def sync():
+    Sync().get_products()
+
+    flash('Synchronized products')
+    return redirect(url_for('home'))
+
