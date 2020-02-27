@@ -37,7 +37,7 @@ class Sync(Server):
     def get_updated_products(self):
         def get_updated_products():
             while True:
-                self.login()
+                #self.login()
 
                 date = app_config['API']['LAST_UPDATED']
                 self.get_products(date)
@@ -54,6 +54,7 @@ class Sync(Server):
             'Account'  : app_config['API']['ACCOUNT'],
             'Username' : app_config['API']['USERNAME'],
             'Password' : app_config['API']['PASSWORD'],
+            'Remember' : 'true',
         }
 
         try:
@@ -68,88 +69,91 @@ class Sync(Server):
                 self.token = data['token']
 
     def get_products(self, date=None):
-        db = Driver().database()
+        try:
+            db = Driver().database()
+        except:
+            db = None
 
         if not(self.token):
             self.login()
 
-        if not(date):
-            url = app_config['API']['URL'] + '/products/?active=true'
-        else:
-            url = app_config['API']['URL'] + '/products/?active=true&date={}'.format(date)
-        logging.info(url)
+        if(db and self.token):
+            if not(date):
+                url = app_config['API']['URL'] + '/products/?active=true'
+            else:
+                url = app_config['API']['URL'] + '/products/?active=true&date={}'.format(date)
+            logging.info(url)
 
-        headers = {
-            'Token' : self.token
-        }
+            headers = {
+                'Token' : self.token
+            }
 
-        try:
-            response = requests.get(url, headers=headers)
-        except:
-            response = None
-        logging.info(url)
+            try:
+                response = requests.get(url, headers=headers)
+            except:
+                response = None
+            logging.info(url)
 
-        if(response):
-            if(response.status_code == requests.codes.ok):
-                if not (date):
-                    db.products.delete_many({})
-
-                    products = json.loads(response.text)
-                    logging.info(len(products))
-
-                    for product in products:
-                        db.products.insert(schema_product.validate(product))
-
-                #GET PRODUCTS FROM BUSINESS
-                business = app_config['API']['BUSINESS']
-                if not(date):
-                    url = app_config['API']['URL'] + '/business/{}/products/?active=true'.format( business )
-                else:
-                    url = app_config['API']['URL'] + '/business/{}/products/?active=true&date={}'.format( business, date )
-
-                try:
-                    response = requests.get(url, headers=headers)
-                except:
-                    response = None
-                logging.info(url)
-
-                if(response):
-                    if(response.status_code == requests.codes.ok):
+            if(response):
+                if(response.status_code == requests.codes.ok):
+                    if not (date):
+                        db.products.delete_many({})
 
                         products = json.loads(response.text)
                         logging.info(len(products))
 
                         for product in products:
-                            _id = ObjectId( product['product'] )
-                            db.products.update({'_id' : _id }, {'$set' : changes_schema_product.validate(product)} )
+                            db.products.insert(schema_product.validate(product))
 
-                        business = app_config['API']['BUSINESS']
-                        branch = app_config['API']['BRANCH']
+                    #GET PRODUCTS FROM BUSINESS
+                    business = app_config['API']['BUSINESS']
+                    if not(date):
+                        url = app_config['API']['URL'] + '/business/{}/products/?active=true'.format( business )
+                    else:
+                        url = app_config['API']['URL'] + '/business/{}/products/?active=true&date={}'.format( business, date )
 
-                        if not(date):
-                            url = app_config['API']['URL'] + '/business/{}/branch/{}/products/?active=true'.format( business, branch )
-                        else:
-                            url = app_config['API']['URL'] + '/business/{}/branch/{}/products/?active=true&date={}'.format( business, branch, date )
+                    try:
+                        response = requests.get(url, headers=headers)
+                    except:
+                        response = None
+                    logging.info(url)
 
-                        try:
-                            response = requests.get(url, headers=headers)
-                        except:
-                            response = None
-                        logging.info(url)
+                    if(response):
+                        if(response.status_code == requests.codes.ok):
 
-                        if(response):
-                            if(response.status_code == requests.codes.ok):
+                            products = json.loads(response.text)
+                            logging.info(len(products))
 
-                                products = json.loads(response.text)
-                                logging.info(len(products))
+                            for product in products:
+                                _id = ObjectId( product['product'] )
+                                db.products.update({'_id' : _id }, {'$set' : changes_schema_product.validate(product)} )
 
-                                for product in products:
-                                    _id = ObjectId( product['product'] )
-                                    db.products.update({'_id' : _id }, {'$set' : changes_schema_product.validate(product)} )
+                            business = app_config['API']['BUSINESS']
+                            branch = app_config['API']['BRANCH']
 
-                                app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
-                                save_config_file()
+                            if not(date):
+                                url = app_config['API']['URL'] + '/business/{}/branch/{}/products/?active=true'.format( business, branch )
+                            else:
+                                url = app_config['API']['URL'] + '/business/{}/branch/{}/products/?active=true&date={}'.format( business, branch, date )
 
+                            try:
+                                response = requests.get(url, headers=headers)
+                            except:
+                                response = None
+                            logging.info(url)
+
+                            if(response):
+                                if(response.status_code == requests.codes.ok):
+
+                                    products = json.loads(response.text)
+                                    logging.info(len(products))
+
+                                    for product in products:
+                                        _id = ObjectId( product['product'] )
+                                        db.products.update({'_id' : _id }, {'$set' : changes_schema_product.validate(product)} )
+
+                                    app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
+                                    save_config_file()
 
 
 
