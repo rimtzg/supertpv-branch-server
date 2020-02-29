@@ -3,8 +3,8 @@ from flask_httpauth import HTTPBasicAuth
 from flask_script import Manager
 import datetime
 import logging
-# from time import sleep
-# import threading
+from time import sleep
+import threading
 
 from config import app_config
 from sync import Sync
@@ -49,12 +49,19 @@ app.register_blueprint(admin)
 #                                                                      #
 ########################################################################
 
+def get_updated_products():
+    while True:
+        date = app_config['API']['LAST_UPDATED']
+        Sync().get_products(date)
+        
+        sleep(int(app_config['API']['DELAY']))
+
 @app.before_first_request
 def first_start():
-    # Sync().get_all_products()
+    Sync().get_products()
 
-    # thread = threading.Thread(target=get_updated_products)
-    # thread.start()
+    thread = threading.Thread(target=get_updated_products)
+    thread.start()
 
     pass
 
@@ -81,8 +88,8 @@ def home():
         
 #         sleep(int(app_config['API']['DELAY']))
 
-manager.add_command('run_get', Sync().get_products())
-manager.add_command('run_sync', Sync().get_updated_products())
+#manager.add_command('run_get', Sync().get_products())
+#manager.add_command('run_sync', Sync().get_updated_products())
 
 if __name__ == '__main__':
     # Sync().get_products()

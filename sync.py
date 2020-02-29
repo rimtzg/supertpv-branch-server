@@ -34,18 +34,24 @@ class Sync(Server):
         # thread = threading.Thread(target=get_updated_products)
         # thread.start()
 
-    def get_updated_products(self):
-        def get_updated_products():
-            while True:
-                #self.login()
+    # def get_updated_products(self):
+    #     def get_updated_products():
+    #         while True:
+    #             #self.login()
 
-                date = app_config['API']['LAST_UPDATED']
-                self.get_products(date)
+    #             date = app_config['API']['LAST_UPDATED']
+
+    #             if(len(date) == 0):
+    #                 date = str(datetime.datetime.utcnow())
+
+    #             self.get_products(date)
                 
-                sleep(int(app_config['API']['DELAY']))
+    #             sleep(int(app_config['API']['DELAY']))
 
-        thread = threading.Thread(target=get_updated_products)
-        thread.start()
+    #     thread = threading.Thread(target=get_updated_products)
+    #     thread.start()
+
+    #     return None
 
     def login(self):
         url = app_config['API']['URL'] + '/token'
