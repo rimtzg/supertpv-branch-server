@@ -103,13 +103,13 @@ class Sync(Server):
             if(response):
                 if(response.status_code == requests.codes.ok):
                     if not (date):
-                        db.products.delete_many({})
 
                         products = json.loads(response.text)
                         logging.info(len(products))
 
                         for product in products:
-                            db.products.insert(schema_product.validate(product))
+                            _id = ObjectId( product['_id'] )
+                            db.products.update({'_id' : _id }, {'$set' : schema_product.validate(product)}, upsert=True )
 
                     #GET PRODUCTS FROM BUSINESS
                     business = app_config['API']['BUSINESS']

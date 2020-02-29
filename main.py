@@ -50,6 +50,8 @@ app.register_blueprint(admin)
 ########################################################################
 
 def get_updated_products():
+    sleep(120)
+
     while True:
         date = app_config['API']['LAST_UPDATED']
         Sync().get_products(date)
@@ -58,7 +60,9 @@ def get_updated_products():
 
 @app.before_first_request
 def first_start():
-    Sync().get_products()
+    # Sync().get_products()
+    thread = threading.Thread(target=Sync().get_products)
+    thread.start()
 
     thread = threading.Thread(target=get_updated_products)
     thread.start()
