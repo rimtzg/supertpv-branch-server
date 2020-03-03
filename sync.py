@@ -12,8 +12,10 @@ from config import app_config, save_config_file
 from driver import Driver
 
 from schemas.products import schema as schema_product
-from schemas.products import changes_schema as changes_schema_product
-from schemas.categories import schema as schema_category
+from schemas.products import modifications as modifications_product
+
+from schemas.volume_discounts import schema as schema_volume_discount
+from schemas.volume_discounts import modifications as modifications_volume_discount
 
 class Sync(Server):
     def __init__(self):
@@ -75,6 +77,10 @@ class Sync(Server):
                 self.token = data['token']
 
     def get_products(self, date=None):
+        server = app_config['API']['URL']
+        business = app_config['API']['BUSINESS']
+        branch = app_config['API']['BRANCH']
+
         try:
             db = Driver().database()
         except:
@@ -85,9 +91,9 @@ class Sync(Server):
 
         if(db and self.token):
             if not(date):
-                url = app_config['API']['URL'] + '/products/?active=true'
+                url = '{}/products/'.format( server )
             else:
-                url = app_config['API']['URL'] + '/products/?active=true&date={}'.format(date)
+                url = '{}/products/?date={}'.format( server, date )
             logging.info(url)
 
             headers = {
@@ -98,31 +104,28 @@ class Sync(Server):
                 response = requests.get(url, headers=headers)
             except:
                 response = None
-            logging.info(url)
 
             if(response):
                 if(response.status_code == requests.codes.ok):
-                    if not (date):
 
-                        products = json.loads(response.text)
-                        logging.info(len(products))
+                    products = json.loads(response.text)
+                    logging.info(len(products))
 
-                        for product in products:
-                            _id = ObjectId( product['_id'] )
-                            db.products.update({'_id' : _id }, {'$set' : schema_product.validate(product)}, upsert=True )
+                    for product in products:
+                        _id = ObjectId( product['_id'] )
+                        db.products.find_one_and_update({'_id' : _id }, {'$set' : schema_product.validate(product)}, upsert=True )
 
                     #GET PRODUCTS FROM BUSINESS
-                    business = app_config['API']['BUSINESS']
                     if not(date):
-                        url = app_config['API']['URL'] + '/business/{}/products/?active=true'.format( business )
+                        url = '{}/business/{}/products/'.format( server, business )
                     else:
-                        url = app_config['API']['URL'] + '/business/{}/products/?active=true&date={}'.format( business, date )
+                        url = '{}/business/{}/products/?date={}'.format( server, business, date )
+                    logging.info(url)
 
                     try:
                         response = requests.get(url, headers=headers)
                     except:
                         response = None
-                    logging.info(url)
 
                     if(response):
                         if(response.status_code == requests.codes.ok):
@@ -131,22 +134,19 @@ class Sync(Server):
                             logging.info(len(products))
 
                             for product in products:
-                                _id = ObjectId( product['product'] )
-                                db.products.update({'_id' : _id }, {'$set' : changes_schema_product.validate(product)} )
-
-                            business = app_config['API']['BUSINESS']
-                            branch = app_config['API']['BRANCH']
+                                _id = ObjectId( product['document'] )
+                                db.products.find_one_and_update({'_id' : _id }, {'$set' : modifications_product.validate(product)} )
 
                             if not(date):
-                                url = app_config['API']['URL'] + '/business/{}/branch/{}/products/?active=true'.format( business, branch )
+                                url = '{}/business/{}/branch/{}/products/'.format( server, business, branch )
                             else:
-                                url = app_config['API']['URL'] + '/business/{}/branch/{}/products/?active=true&date={}'.format( business, branch, date )
+                                url = '{}/business/{}/branch/{}/products/?date={}'.format( server, business, branch, date )
+                            logging.info(url)
 
                             try:
                                 response = requests.get(url, headers=headers)
                             except:
                                 response = None
-                            logging.info(url)
 
                             if(response):
                                 if(response.status_code == requests.codes.ok):
@@ -155,11 +155,87 @@ class Sync(Server):
                                     logging.info(len(products))
 
                                     for product in products:
-                                        _id = ObjectId( product['product'] )
-                                        db.products.update({'_id' : _id }, {'$set' : changes_schema_product.validate(product)} )
+                                        _id = ObjectId( product['document'] )
+                                        db.products.find_one_and_update({'_id' : _id }, {'$set' : modifications_product.validate(product)} )
 
-                                    app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
-                                    save_config_file()
+    def get_volume_discount(self):
+        server = app_config['API']['URL']
+        business = app_config['API']['BUSINESS']
+        branch = app_config['API']['BRANCH']
+
+        try:
+            db = Driver().database()
+        except:
+            db = None
+
+        if not(self.token):
+            self.login()
+
+        if(db and self.token):
+            headers = {
+                'Token' : self.token
+            }
+
+            url = '{}/{}/'.format( server, 'volume_discounts' )
+            logging.info(url)
+
+            try:
+                response = requests.get(url, headers=headers)
+            except:
+                response = None
+
+            if(response):
+                if(response.status_code == requests.codes.ok):
+
+                    discounts = json.loads(response.text)
+                    logging.info(len(discounts))
+
+                    for discount in discounts:
+                        #print(discount)
+
+                        _id = ObjectId( discount['_id'] )
+                        db.volume_discounts.find_one_and_update({'_id' : _id }, {'$set' : schema_volume_discount.validate(discount)}, upsert=True )
+
+                    url = '{}/business/{}/{}/'.format( server, business, 'volume_discounts' )
+                    logging.info(url)
+
+                    try:
+                        response = requests.get(url, headers=headers)
+                    except:
+                        response = None
+
+                    if(response):
+                        if(response.status_code == requests.codes.ok):
+
+                            discounts = json.loads(response.text)
+                            logging.info(len(discounts))
+
+                            for discount in discounts:
+                                _id = ObjectId( discount['document'] )
+                                db.volume_discounts.find_one_and_update({'_id' : _id }, {'$set' : modifications_volume_discount.validate(discount)}, upsert=True )
+
+                            url = '{}/business/{}/branch/{}/{}/'.format( server, business, branch, 'volume_discounts' )
+                            logging.info(url)
+
+                            try:
+                                response = requests.get(url, headers=headers)
+                            except:
+                                response = None
+
+                            if(response):
+                                if(response.status_code == requests.codes.ok):
+
+                                    discounts = json.loads(response.text)
+                                    logging.info(len(discounts))
+
+                                    for discount in discounts:
+                                        #print(discount)
+
+                                        _id = ObjectId( discount['document'] )
+                                        db.volume_discounts.find_one_and_update({'_id' : _id }, {'$set' : modifications_volume_discount.validate(discount)}, upsert=True )
+            
+
+
 
 
 

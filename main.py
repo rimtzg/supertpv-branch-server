@@ -6,7 +6,7 @@ import logging
 from time import sleep
 import threading
 
-from config import app_config
+from config import app_config, save_config_file
 from sync import Sync
 
 from routes.config import app as config
@@ -49,22 +49,33 @@ app.register_blueprint(admin)
 #                                                                      #
 ########################################################################
 
-def get_updated_products():
+sync = Sync()
+
+def get_data():
+    #sync.get_products()
+    sync.get_volume_discount()
+
+def get_updates():
     sleep(120)
 
     while True:
         date = app_config['API']['LAST_UPDATED']
-        Sync().get_products(date)
+        
+        sync.get_products(date)
+        sync.get_volume_discount()
         
         sleep(int(app_config['API']['DELAY']))
+
+        app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
+        save_config_file()
 
 @app.before_first_request
 def first_start():
     # Sync().get_products()
-    thread = threading.Thread(target=Sync().get_products)
+    thread = threading.Thread(target=get_data)
     thread.start()
 
-    thread = threading.Thread(target=get_updated_products)
+    thread = threading.Thread(target=get_updates)
     thread.start()
 
     pass
