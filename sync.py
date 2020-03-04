@@ -76,6 +76,15 @@ class Sync(Server):
 
                 self.token = data['token']
 
+    def del_products(self):
+        try:
+            db = Driver().database()
+        except:
+            db = None
+
+        if(db):
+            db.products.delete_many({})
+
     def get_products(self, date=None):
         server = app_config['API']['URL']
         business = app_config['API']['BUSINESS']

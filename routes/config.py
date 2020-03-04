@@ -44,7 +44,9 @@ def save():
 
 @app.route('/sync', methods=['POST'])
 def sync():
-    Sync().get_products()
+    sync = Sync()
+    sync.del_products()
+    sync.get_products()
 
     flash('Synchronized products')
     return redirect(url_for('home'))
