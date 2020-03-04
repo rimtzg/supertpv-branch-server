@@ -52,7 +52,7 @@ app.register_blueprint(admin)
 sync = Sync()
 
 def get_data():
-    #sync.get_products()
+    sync.get_products()
     sync.get_volume_discount()
 
 def get_updates():
