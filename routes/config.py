@@ -44,6 +44,9 @@ def save():
 
 @app.route('/sync', methods=['POST'])
 def sync():
+    if not session.get('logged_in'):
+        abort(401)
+        
     sync = Sync()
     sync.del_products()
     sync.get_products()
