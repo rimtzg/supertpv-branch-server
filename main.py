@@ -50,10 +50,15 @@ app.register_blueprint(admin)
 ########################################################################
 
 sync = Sync()
+# date = app_config['API']['LAST_UPDATED']
+# print(date)
+# print(datetime.datetime.utcnow())
+# sync.get_products(date)
 
 def get_data():
     sync.get_products()
     sync.get_volume_discount()
+    pass
 
 def get_updates():
     sleep(120)
@@ -63,11 +68,11 @@ def get_updates():
         
         sync.get_products(date)
         sync.get_volume_discount()
-        
-        sleep(int(app_config['API']['DELAY']))
 
         app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
         save_config_file()
+
+        sleep(int(app_config['API']['DELAY']))
 
 @app.before_first_request
 def first_start():
