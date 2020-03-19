@@ -49,7 +49,7 @@ app.register_blueprint(admin)
 #                                                                      #
 ########################################################################
 
-sync = Sync()
+# sync = Sync()
 # date = app_config['API']['LAST_UPDATED']
 # print(date)
 # print(datetime.datetime.utcnow())
@@ -61,27 +61,28 @@ def get_data():
     pass
 
 def get_updates():
-    sleep(120)
+    # sleep(120)
+    DATE = str(datetime.datetime.utcnow())
 
     while True:
-        date = app_config['API']['LAST_UPDATED']
+        # date = app_config['API']['LAST_UPDATED']
         
-        sync.get_products(date)
-        sync.get_volume_discount()
+        sync.get_products(DATE)
+        #sync.get_volume_discount()
 
-        app_config['API']['LAST_UPDATED'] = str(datetime.datetime.utcnow())
-        save_config_file()
+        DATE = str(datetime.datetime.utcnow())
+        #save_config_file()
 
-        sleep(int(app_config['API']['DELAY']))
+        sleep(30)
 
 @app.before_first_request
 def first_start():
     # Sync().get_products()
-    thread = threading.Thread(target=get_data)
-    thread.start()
+    # thread = threading.Thread(target=get_data)
+    # thread.start()
 
-    thread = threading.Thread(target=get_updates)
-    thread.start()
+    # thread = threading.Thread(target=get_updates)
+    # thread.start()
 
     pass
 
@@ -112,9 +113,11 @@ def home():
 #manager.add_command('run_sync', Sync().get_updated_products())
 
 if __name__ == '__main__':
-    # Sync().get_products()
+    sync = Sync()
 
-    # thread = threading.Thread(target=get_updated_products)
-    # thread.start()
+    get_data()
+
+    thread = threading.Thread(target=get_updates)
+    thread.start()
     
-    app.run(host='0.0.0.0', port=3001, debug=DEBUG )
+    app.run(host='0.0.0.0', port=8000, debug=DEBUG )
