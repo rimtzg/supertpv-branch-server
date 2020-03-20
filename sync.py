@@ -125,10 +125,7 @@ class Sync(Server):
                         db.products.find_one_and_update({'_id' : _id }, {'$set' : schema_product.validate(product)}, upsert=True )
 
                     #GET PRODUCTS FROM BUSINESS
-                    if not(date):
-                        url = '{}/business/{}/products/'.format( server, business )
-                    else:
-                        url = '{}/business/{}/products/?date={}'.format( server, business, date )
+                    url = '{}/business/{}/products/'.format( server, business )
                     logging.info(url)
 
                     try:
@@ -146,10 +143,7 @@ class Sync(Server):
                                 _id = ObjectId( product['document'] )
                                 db.products.find_one_and_update({'_id' : _id }, {'$set' : modifications_product.validate(product)} )
 
-                            if not(date):
-                                url = '{}/business/{}/branch/{}/products/'.format( server, business, branch )
-                            else:
-                                url = '{}/business/{}/branch/{}/products/?date={}'.format( server, business, branch, date )
+                            url = '{}/business/{}/branch/{}/products/'.format( server, business, branch )
                             logging.info(url)
 
                             try:

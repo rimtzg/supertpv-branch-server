@@ -3,5 +3,5 @@ flask_httpauth
 requests
 pymongo
 schema
-gunicorn
+gunicorn[eventlet]
 flask_script
