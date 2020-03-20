@@ -18,7 +18,10 @@ from routes.admin import app as admin
 #                                                                      #
 ########################################################################
 
-DEBUG = app_config['APP']['DEBUG']
+try:
+    DEBUG = app_config['APP']['DEBUG']
+except:
+    DEBUG = True
 SECRET_KEY = app_config['SERVER']['SECRET_KEY']
 
 ########################################################################
