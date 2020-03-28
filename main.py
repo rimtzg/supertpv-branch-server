@@ -65,6 +65,8 @@ sync = Sync()
 
 def get_updates():
     sync.get_products()
+    sync.get_prices()
+    sync.get_discounts()
     sync.get_volume_discount()
 
     # sleep(120)
@@ -75,16 +77,15 @@ def get_updates():
         # date = app_config['API']['LAST_UPDATED']
         
         sync.get_products(DATE)
+        sync.get_prices(DATE)
+        sync.get_discounts(DATE)
+        sync.get_volume_discount(DATE)
         #sync.get_volume_discount()
 
         DATE = str(datetime.datetime.utcnow())
         #save_config_file()
 
         sleep(30)
-
-def on_starting(server):
-    logging.info('HOLA')
-    pass
 
 @app.before_first_request
 def first_start():
@@ -121,7 +122,7 @@ def home():
 #         sleep(int(app_config['API']['DELAY']))
 
 #manager.add_command('run_get', Sync().get_products())
-#manager.add_command('run_sync', Sync().get_updated_products())
+# manager.add_command('run_sync', on_starting)
 
 if __name__ == '__main__':
     # sync = Sync()
@@ -132,3 +133,4 @@ if __name__ == '__main__':
     # thread.start()
     
     app.run(host='0.0.0.0', port=8000, debug=DEBUG )
+    # manager.run()

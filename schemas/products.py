@@ -16,6 +16,9 @@ schema = Schema({
     Optional('profit', default=20) : Use(int),
     'price' : Use(float),
 
+    Optional('round', default=True) : Use(bool),
+    Optional('pin',   default=False) : Use(bool),
+
     Optional('iva', default=False) : Use(bool),
     Optional('ieps', default=False) : Use(bool),
     Optional('volume_discount', default=None) : Use(ObjectId),
