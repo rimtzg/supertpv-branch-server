@@ -14,8 +14,8 @@ from driver import Driver
 from schemas.products import schema as product_schema
 from schemas.prices import schema as price_schema
 from schemas.discounts import schema as discount_schema
-
 from schemas.volume_discounts import schema as schema_volume_discount
+from schemas.cashiers import schema as schema_cashier
 
 class Sync(Server):
     def __init__(self):
@@ -210,10 +210,44 @@ class Sync(Server):
                         _id = ObjectId( discount['_id'] )
                         db.volume_discounts.find_one_and_update({'_id' : _id }, {'$set' : schema_volume_discount.validate(discount)}, upsert=True )
             
+    def get_cashiers(self, date=None):
+        server = app_config['API']['URL']
 
+        try:
+            db = Driver().database()
+        except:
+            db = None
 
+        if not(self.token):
+            self.login()
 
+        if(db and self.token):
+            if not(date):
+                url = '{}/cashiers/'.format( server )
+            else:
+                url = '{}/cashiers/?date={}'.format( server, date )
+            logging.info(url)
 
+            headers = {
+                'Token' : self.token
+            }
+
+            try:
+                response = requests.get(url, headers=headers)
+            except:
+                response = None
+
+            if(response):
+                if(response.status_code == requests.codes.ok):
+
+                    get_cashiers = json.loads(response.text)
+                    logging.info(len(get_cashiers))
+
+                    for cashier in get_cashiers:
+                        #print(discount)
+
+                        _id = ObjectId( cashier['_id'] )
+                        db.cashiers.find_one_and_update({'_id' : _id }, {'$set' : schema_cashier.validate(cashier)}, upsert=True )
 
 
 

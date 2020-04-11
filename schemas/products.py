@@ -8,7 +8,7 @@ schema = Schema({
     Optional('name') : Use(str.lower),
     Optional('category', default=None) : Use(ObjectId),
     Optional('mark', default=None) : Use(ObjectId),
-    'description' : Use(str.lower),
+    Optional('description') : Use(str.lower),
     Optional('presentation', default=None) : Use(ObjectId),
     Optional('content') : Use(str),
     Optional('unit', default=None) : Use(ObjectId),

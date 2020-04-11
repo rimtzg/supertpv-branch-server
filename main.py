@@ -68,10 +68,11 @@ def get_updates():
     sync.get_prices()
     sync.get_discounts()
     sync.get_volume_discount()
-
-    # sleep(120)
+    sync.get_cashiers()
     
     DATE = str(datetime.datetime.utcnow())
+
+    # sleep(120)
 
     while True:
         # date = app_config['API']['LAST_UPDATED']
@@ -80,6 +81,7 @@ def get_updates():
         sync.get_prices(DATE)
         sync.get_discounts(DATE)
         sync.get_volume_discount(DATE)
+        sync.get_cashiers(DATE)
         #sync.get_volume_discount()
 
         DATE = str(datetime.datetime.utcnow())

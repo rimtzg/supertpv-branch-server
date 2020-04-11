@@ -1,3 +1,5 @@
 mongod --dbpath=/Users/rimtzg/data/db/
 
 mongod --config /usr/local/etc/mongod.conf
+
+gunicorn wsgi:app -t 240 --worker-class eventlet
