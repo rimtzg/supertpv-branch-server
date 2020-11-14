@@ -303,7 +303,15 @@ class Sync(Server):
 
                 _id = session['_id']
                 initial_money = session['initial_money']
-                total_sales = session['total']
+                if(session.get('total')):
+                    total_sales = session['total']
+                else:
+                    total_sales = 0
+                start_date = session['start']
+                if(session.get('end_date')):
+                    end_date = session['end']
+                else:
+                    end_date = datetime.datetime.now()
 
                 money_movements = db.MoneyMovements.find({'session': session['_id']})
                 total_incomes = 0
@@ -354,8 +362,8 @@ class Sync(Server):
                     'total_card_payments' : total_card_payments,
                     'difference'          : difference,
 
-                    'start_date'          : session['start'],
-                    'end_date'            : session['end'],
+                    'start_date'          : start_date,
+                    'end_date'            : end_date,
 
                     'cashier'             : session['user_id']
                 }

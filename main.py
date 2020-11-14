@@ -80,11 +80,10 @@ def get_updates():
         NEW_DATE = datetime.datetime.utcnow().isoformat()
         
         sync.get_products(DATE)
-        sync.get_prices()
+        sync.get_prices(DATE)
         sync.get_discounts(DATE)
         sync.get_volume_discount(DATE)
         sync.get_cashiers(DATE)
-        sync.get_volume_discount()
         sync.upload_session()
 
         DATE = NEW_DATE
