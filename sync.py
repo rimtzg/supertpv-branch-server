@@ -303,15 +303,17 @@ class Sync(Server):
 
                 _id = session['_id']
                 initial_money = session['initial_money']
-                if(session.get('total')):
-                    total_sales = session['total']
-                else:
-                    total_sales = 0
+
                 start_date = session['start']
-                if(session.get('end_date')):
+                if(session.get('end')):
                     end_date = session['end']
                 else:
                     end_date = datetime.datetime.now()
+
+                sales = db.Sales.find({'session': session['_id']})
+                total_sales = 0
+                for sale in sales:
+                    total_sales += sale['total']
 
                 money_movements = db.MoneyMovements.find({'session': session['_id']})
                 total_incomes = 0
