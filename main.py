@@ -24,6 +24,8 @@ except:
     DEBUG = True
 SECRET_KEY = app_config['SERVER']['SECRET_KEY']
 
+DELAY_TIME = 10
+
 ########################################################################
 #                                                                      #
 #                                 INIT                                 #
@@ -75,19 +77,20 @@ def get_updates():
     # sleep(120)
 
     while True:
-        # date = app_config['API']['LAST_UPDATED']
+        date = app_config['API']['LAST_UPDATED']
         
         sync.get_products(DATE)
         sync.get_prices(DATE)
         sync.get_discounts(DATE)
         sync.get_volume_discount(DATE)
         sync.get_cashiers(DATE)
-        #sync.get_volume_discount()
+        sync.get_volume_discount()
+        sync.upload_session()
 
         DATE = str(datetime.datetime.utcnow())
         #save_config_file()
 
-        sleep(30)
+        sleep(DELAY_TIME)
 
 @app.before_first_request
 def first_start():

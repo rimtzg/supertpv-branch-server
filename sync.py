@@ -1,6 +1,7 @@
 from flask import session
 from flask_script import Server
 import json
+from json import JSONEncoder
 import requests
 import datetime
 from bson.objectid import ObjectId
@@ -16,6 +17,16 @@ from schemas.prices import schema as price_schema
 from schemas.discounts import schema as discount_schema
 from schemas.volume_discounts import schema as schema_volume_discount
 from schemas.cashiers import schema as schema_cashier
+from schemas.sessions import schema as schema_session
+
+# subclass JSONEncoder
+class DateTimeEncoder(JSONEncoder):
+        #Override the default method
+        def default(self, obj):
+            if isinstance(obj, (datetime.date, datetime.datetime)):
+                return obj.isoformat()
+            if isinstance(obj, ObjectId):
+                return str(obj)
 
 class Sync(Server):
     def __init__(self):
@@ -249,6 +260,86 @@ class Sync(Server):
                         _id = ObjectId( cashier['_id'] )
                         db.cashiers.find_one_and_update({'_id' : _id }, {'$set' : schema_cashier.validate(cashier)}, upsert=True )
 
+    def upload_session(self):
+        logging.info('Upload sessions')
 
+        server = app_config['API']['URL']
+
+        try:
+            db = Driver().database()
+        except:
+            db = None
+
+        if not(self.token):
+            self.login()
+
+        if(db and self.token):
+            query = {
+                'uploaded' : { '$ne' : True }
+            }
+
+            headers = {
+                'Token' : self.token,
+                'Content-Type' : 'application/json'
+            }
+
+            sessions = db.Sessions.find(query).sort([("start", -1)]).limit(10)
+
+            for session in sessions:
+
+                _id = session['_id']
+                initial_money = session['initial_money']
+                total_sales = session['total']
+
+                money_movements = db.MoneyMovements.find({'session': session['_id']})
+                total_incomes = 0
+                total_expenses = 0
+                for money in money_movements:
+                    if(money['type'] == 'out'):
+                        total_expenses += money['amount']
+                    else:
+                        total_incomes += money['amount']
+
+                deposits = db.Deposits.find({'session._id': session['_id']})
+                total_deposits = 0
+                for deposit in deposits:
+                    total_deposits += deposit['total']
+
+                card_payments = db.CardPayments.find({'session._id': session['_id']})
+                total_card_payments = 0
+                for payment in card_payments:
+                    total_card_payments += payment['amount'] - payment['commission']
+
+                
+                returns = db.Returns.find({'session._id': session['_id']})
+                total_returns = 0
+                for ret in returns:
+                    total_returns += ret['total']
+
+                difference = total_deposits + total_returns + total_expenses +total_card_payments - initial_money - total_sales - total_incomes
+                
+                data = {
+                    '_id'                 : _id,
+                    'initial_money'       : initial_money,
+                    'total_sales'         : total_sales,
+                    'num_of_sales'        : len(session['sales']),
+                    'total_incomes'       : total_incomes,
+                    'total_expenses'      : total_expenses,
+                    'total_deposits'      : total_deposits,
+                    'total_returns'       : total_returns,
+                    'total_card_payments' : total_card_payments,
+                    'difference'          : difference,
+
+                    'start_date'          : session['start'],
+                    'end_date'            : session['end'],
+
+                    'cashier'             : session['user_id']
+                }
+
+                url = '{}/sessions/{}'.format( server, session['_id'] )
+                try:
+                    response = requests.put(url, data=DateTimeEncoder().encode(data), headers=headers)
+                except:
+                    logging.exception('Error valuating data on modify')
 
 
