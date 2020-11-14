@@ -265,25 +265,37 @@ class Sync(Server):
 
         server = app_config['API']['URL']
 
+        logging.info(server)
+
         try:
             db = Driver().database()
         except:
             db = None
 
+        logging.info(db)
+
         if not(self.token):
             self.login()
+
+        logging.info(self.token)
 
         if(db and self.token):
             query = {
                 'uploaded' : { '$ne' : True }
             }
 
+            logging.info(query)
+
             headers = {
                 'Token' : self.token,
                 'Content-Type' : 'application/json'
             }
 
+            logging.info(headers)
+
             sessions = db.Sessions.find(query).sort([("start", -1)]).limit(10)
+
+            logging.info(sessions)
 
             for session in sessions:
 
@@ -335,6 +347,8 @@ class Sync(Server):
 
                     'cashier'             : session['user_id']
                 }
+
+                logging.info(data)
 
                 url = '{}/sessions/{}'.format( server, session['_id'] )
                 try:
