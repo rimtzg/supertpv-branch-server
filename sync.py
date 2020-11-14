@@ -308,7 +308,7 @@ class Sync(Server):
                 if(session.get('end')):
                     end_date = session['end']
                 else:
-                    end_date = datetime.datetime.now()
+                    end_date = None
 
                 sales = db.Sales.find({'session': session['_id']})
                 total_sales = 0
