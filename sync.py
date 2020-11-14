@@ -299,6 +299,8 @@ class Sync(Server):
 
             for session in sessions:
 
+                logging.info(session)
+
                 _id = session['_id']
                 initial_money = session['initial_money']
                 total_sales = session['total']
@@ -312,23 +314,33 @@ class Sync(Server):
                     else:
                         total_incomes += money['amount']
 
+                logging.info(total_incomes)
+                logging.info(total_expenses)
+
                 deposits = db.Deposits.find({'session._id': session['_id']})
                 total_deposits = 0
                 for deposit in deposits:
                     total_deposits += deposit['total']
+
+                logging.info(total_deposits)
 
                 card_payments = db.CardPayments.find({'session._id': session['_id']})
                 total_card_payments = 0
                 for payment in card_payments:
                     total_card_payments += payment['amount'] - payment['commission']
 
+                logging.info(total_card_payments)
                 
                 returns = db.Returns.find({'session._id': session['_id']})
                 total_returns = 0
                 for ret in returns:
                     total_returns += ret['total']
 
+                logging.info(total_returns)
+
                 difference = total_deposits + total_returns + total_expenses +total_card_payments - initial_money - total_sales - total_incomes
+
+                logging.info(difference)
                 
                 data = {
                     '_id'                 : _id,
@@ -351,6 +363,8 @@ class Sync(Server):
                 logging.info(data)
 
                 url = '{}/sessions/{}'.format( server, session['_id'] )
+                logging.info(url)
+
                 try:
                     response = requests.put(url, data=DateTimeEncoder().encode(data), headers=headers)
                 except:
