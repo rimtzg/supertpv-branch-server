@@ -72,22 +72,22 @@ def get_updates():
     sync.get_volume_discount()
     sync.get_cashiers()
     
-    DATE = str(datetime.datetime.utcnow())
+    DATE = datetime.datetime.utcnow().isoformat()
 
     # sleep(120)
 
     while True:
-        date = app_config['API']['LAST_UPDATED']
+        NEW_DATE = datetime.datetime.utcnow().isoformat()
         
         sync.get_products(DATE)
-        sync.get_prices(DATE)
+        sync.get_prices()
         sync.get_discounts(DATE)
         sync.get_volume_discount(DATE)
         sync.get_cashiers(DATE)
         sync.get_volume_discount()
         sync.upload_session()
 
-        DATE = str(datetime.datetime.utcnow())
+        DATE = NEW_DATE
         #save_config_file()
 
         sleep(DELAY_TIME)
