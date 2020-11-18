@@ -310,7 +310,7 @@ class Sync(Server):
                 else:
                     end_date = None
 
-                sales = db.Sales.find({'session': session['_id']})
+                sales = db.Sales.find({'session': session['_id'], 'canceled' : { '$ne' : True }})
                 total_sales = 0
                 for sale in sales:
                     total_sales += sale['total']
