@@ -5,3 +5,4 @@ pymongo
 schema
 gunicorn[eventlet]
 flask_script
+flask_cors

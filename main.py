@@ -1,16 +1,20 @@
 from flask import Flask, render_template, g, session
 from flask_httpauth import HTTPBasicAuth
 from flask_script import Manager
-import datetime
+from flask_cors import CORS
+from datetime import date, datetime
 import logging
 from time import sleep
 import threading
+import json
+from bson import ObjectId
 
 from config import app_config, save_config_file
 from sync import Sync
 
 from routes.config import app as config
 from routes.admin import app as admin
+from routes.api import app as api
 
 ########################################################################
 #                                                                      #
@@ -33,11 +37,22 @@ DELAY_TIME = 10
 ########################################################################
 
 app = Flask(__name__)
+cors = CORS(app)
 auth = HTTPBasicAuth()
 app.config['SECRET_KEY'] = SECRET_KEY
 manager = Manager(app)
 
 logging.basicConfig(level=logging.DEBUG)
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        if isinstance(obj, (date, datetime)):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
+
+app.json_encoder = JSONEncoder
 
 ########################################################################
 #                                                                      #
@@ -47,6 +62,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 app.register_blueprint(config)
 app.register_blueprint(admin)
+app.register_blueprint(api)
 
 ########################################################################
 #                                                                      #
@@ -72,19 +88,21 @@ def get_updates():
     sync.get_volume_discount()
     sync.get_cashiers()
     
-    DATE = datetime.datetime.utcnow().isoformat()
+    DATE = datetime.utcnow().isoformat()
 
     # sleep(120)
 
     while True:
-        NEW_DATE = datetime.datetime.utcnow().isoformat()
+        NEW_DATE = datetime.utcnow().isoformat()
         
         sync.get_products(DATE)
         sync.get_prices(DATE)
         sync.get_discounts(DATE)
         sync.get_volume_discount(DATE)
         sync.get_cashiers(DATE)
+
         sync.upload_session()
+        sync.upload_sales()
 
         DATE = NEW_DATE
         #save_config_file()

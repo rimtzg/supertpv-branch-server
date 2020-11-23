@@ -10,7 +10,7 @@ from time import sleep
 import threading
 
 from config import app_config, save_config_file
-from driver import Driver
+from driver import mongo
 
 from schemas.products import schema as product_schema
 from schemas.prices import schema as price_schema
@@ -55,7 +55,7 @@ class Sync(Server):
 
     def del_products(self):
         try:
-            db = Driver().database()
+            db = mongo
         except:
             db = None
 
@@ -66,7 +66,7 @@ class Sync(Server):
         server = app_config['API']['URL']
 
         try:
-            db = Driver().database()
+            db = mongo
         except:
             db = None
 
@@ -103,7 +103,7 @@ class Sync(Server):
         server = app_config['API']['URL']
 
         try:
-            db = Driver().database()
+            db = mongo
         except:
             db = None
 
@@ -140,7 +140,7 @@ class Sync(Server):
         server = app_config['API']['URL']
 
         try:
-            db = Driver().database()
+            db = mongo
         except:
             db = None
 
@@ -186,7 +186,7 @@ class Sync(Server):
         server = app_config['API']['URL']
 
         try:
-            db = Driver().database()
+            db = mongo
         except:
             db = None
 
@@ -225,7 +225,7 @@ class Sync(Server):
         server = app_config['API']['URL']
 
         try:
-            db = Driver().database()
+            db = mongo
         except:
             db = None
 
@@ -268,7 +268,7 @@ class Sync(Server):
         logging.info(server)
 
         try:
-            db = Driver().database()
+            db = mongo
         except:
             db = None
 
@@ -280,8 +280,11 @@ class Sync(Server):
         logging.info(self.token)
 
         if(db and self.token):
+            date = datetime.datetime.now() - datetime.timedelta(days=2)
+
             query = {
-                'uploaded' : { '$ne' : True }
+                'uploaded' : { '$ne' : True },
+                'start' : { '$gte' : date }
             }
 
             logging.info(query)
@@ -348,7 +351,7 @@ class Sync(Server):
 
                 logging.info(total_returns)
 
-                difference = total_deposits + total_returns + total_expenses +total_card_payments - initial_money - total_sales - total_incomes
+                difference = total_deposits + total_returns + total_expenses + total_card_payments - initial_money - total_sales - total_incomes
 
                 logging.info(difference)
                 
@@ -380,4 +383,89 @@ class Sync(Server):
                 except:
                     logging.exception('Error valuating data on modify')
 
+    def upload_sales(self):
+        logging.info('Upload sales')
 
+        server = app_config['API']['URL']
+
+        logging.info(server)
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        logging.info(db)
+
+        if not(self.token):
+            self.login()
+
+        logging.info(self.token)
+
+        if(db and self.token):
+            date = datetime.datetime.now() - datetime.timedelta(days=2)
+
+            query = {
+                'date' : { '$gte' : date }
+            }
+
+            logging.info(query)
+
+            headers = {
+                'Token' : self.token,
+                'Content-Type' : 'application/json'
+            }
+
+            logging.info(headers)
+
+            sales = db.Sales.find(query).sort([("date", -1)]).limit(10)
+
+            logging.info(sales)
+
+            for sale in sales:
+
+                logging.info(sale)
+
+                products = []
+
+                for prod in sale['products']:
+                    product = {
+                        '_id' : sale['products'][prod]['_id'],
+                        'code' : sale['products'][prod]['code'],
+                        'name' : sale['products'][prod]['name'],
+                        'cost' : sale['products'][prod]['cost'],
+                        'price' : sale['products'][prod]['price'],
+                        'amount' : sale['products'][prod]['amount'],
+                        'subtotal' : sale['products'][prod]['subtotal'],
+                    }
+
+                    products.append(product)
+
+                if(sale.get('ticket')):
+                    ticket = sale['ticket']
+                else:
+                    ticket = None
+
+                data = {
+                    '_id' : sale['_id'],
+                    'date' : sale['date'],
+                    'cashier_id' : sale['cashier_id'],
+                    'cashier_name' : sale['cashier_name'],
+                    'canceled' : sale['canceled'],
+                    'session_id' : sale['session'],
+                    'total' : sale['total'],
+                    'ticket' : ticket,
+                    'products' : products
+                }
+
+                logging.info(data)
+
+                url = '{}/sales/{}'.format( server, sale['_id'] )
+                logging.info(url)
+
+                try:
+                    response = requests.put(url, data=DateTimeEncoder().encode(data), headers=headers)
+                except:
+                    logging.exception('Error valuating data on modify')
+
+        pass
