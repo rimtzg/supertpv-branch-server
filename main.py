@@ -111,6 +111,8 @@ def upload_data():
         sync.upload_session()
         sync.upload_sales()
 
+        sleep(60)
+
 @app.before_first_request
 def first_start():
     # Sync().get_products()
