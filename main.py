@@ -101,13 +101,15 @@ def get_updates():
         sync.get_volume_discount(DATE)
         sync.get_cashiers(DATE)
 
-        sync.upload_session()
-        sync.upload_sales()
-
         DATE = NEW_DATE
         #save_config_file()
 
         sleep(DELAY_TIME)
+
+def upload_data():
+    while True:
+        sync.upload_session()
+        sync.upload_sales()
 
 @app.before_first_request
 def first_start():
@@ -115,8 +117,11 @@ def first_start():
     # thread = threading.Thread(target=get_data)
     # thread.start()
 
-    thread = threading.Thread(target=get_updates)
-    thread.start()
+    updates = threading.Thread(target=get_updates)
+    updates.start()
+
+    uploads = threading.Thread(target=upload_data)
+    uploads.start()
 
     pass
 
