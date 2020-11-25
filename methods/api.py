@@ -194,7 +194,52 @@ class Methods():
 
         return product
 
+    def get_products(self):
+        data = request.args
 
+        if(not data.get('name') ):
+            abort(404)
+        
+        query = {
+            'name': {'$regex': data['name']},
+            'active' : True
+        }
+
+        documents = mongo['products'].find(query).sort([("name", 1)])
+
+        return list(documents)
+
+    def save_sale(self):
+        _id = ObjectId()
+        args = request.args
+        data = request.json
+
+        if(not args.get('session') ):
+            abort(403)
+
+        query = {
+            '_id' : _id,
+            'session' : ObjectId(args['session'])
+        }
+
+        if(data.get('canceled') and data['canceled']):
+            ticket = mongo['sales'].find({"ticket" : { '$exists': True }}).count()+1
+
+            data['ticket'] = ticket
+
+        num_of_products = 0
+        for product in data['products']:
+            if(product['scale']):
+                num_of_products += 1
+            else:
+                num_of_products += product['amount']
+
+        data['num_of_products'] = num_of_products
+        data['date'] = datetime.utcnow()
+
+        document = mongo['sales'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
+
+        return document
 
 
 

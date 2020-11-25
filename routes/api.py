@@ -46,7 +46,23 @@ def get_card_payments():
     return jsonify(Methods().get_card_payments())
 
 
+@app.route('/sale', methods=['POST'])
+def save_sale():
+    return jsonify(Methods().save_sale())
+
 
 @app.route('/product', methods=['GET'])
 def get_product():
     return jsonify(Methods().get_product())
+
+@app.route('/products', methods=['GET'])
+def get_products():
+    return jsonify(Methods().get_products())
+
+
+
+
+
+
+
+
