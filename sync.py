@@ -406,7 +406,8 @@ class Sync(Server):
             date = datetime.datetime.now() - datetime.timedelta(days=2)
 
             query = {
-                'date' : { '$gte' : date }
+                'date' : { '$gte' : date },
+                'uploaded' : { '$ne' : True }
             }
 
             logging.info(query)
@@ -467,5 +468,7 @@ class Sync(Server):
                     response = requests.put(url, data=DateTimeEncoder().encode(data), headers=headers)
                 except:
                     logging.exception('Error valuating data on modify')
+
+                db.Sales.find_one_and_update({'_id' : sale['_id'] }, {'$set' : {'uploaded' : True}})
 
         pass
