@@ -33,18 +33,33 @@ def get_returns():
 def get_deposits():
     return jsonify(Methods().get_deposits())
 
+@app.route('/deposits', methods=['POST'])
+def save_deposit():
+    return jsonify(Methods().save_deposit())
+
 @app.route('/incomes', methods=['GET'])
 def get_incomes():
     return jsonify(Methods().get_incomes())
+
+@app.route('/incomes', methods=['POST'])
+def save_income():
+    return jsonify(Methods().save_income())
 
 @app.route('/payments', methods=['GET'])
 def get_payments():
     return jsonify(Methods().get_payments())
 
+@app.route('/payments', methods=['POST'])
+def save_payment():
+    return jsonify(Methods().save_payment())
+
 @app.route('/card_payments', methods=['GET'])
 def get_card_payments():
     return jsonify(Methods().get_card_payments())
 
+@app.route('/card_payments', methods=['POST'])
+def save_card_payment():
+    return jsonify(Methods().save_card_payment())
 
 @app.route('/sale', methods=['POST'])
 def save_sale():

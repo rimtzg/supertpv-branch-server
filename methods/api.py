@@ -110,6 +110,40 @@ class Methods():
 
         return list(documents)
 
+    def save_deposit(self):
+        data = request.json
+        args = request.args
+
+        if(not args.get('session') ):
+            abort(403)
+
+        if(data.get('_id')):
+            _id = ObjectId(data['_id'])
+        else:
+            _id = ObjectId()
+
+        data['_id'] = _id
+
+        if(data.get('date')):
+            data['date'] = datetime.fromisoformat(data['date'])
+        else:
+            data['date'] = datetime.utcnow()
+
+        data['session'] = ObjectId(args['session'])
+
+        if(not data.get('canceled') or data['canceled'] == False):
+            number = mongo['deposits'].find({"number" : { '$exists': True }}).count()+1
+
+            data['number'] = number
+
+        query = {
+            '_id' : _id
+        }
+
+        document = mongo['deposits'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
+
+        return document
+
     def get_incomes(self):
         data = request.args
 
@@ -125,6 +159,35 @@ class Methods():
         documents = mongo['incomes'].find(query).sort([("date", 1)])
 
         return list(documents)
+
+    def save_income(self):
+        data = request.json
+        args = request.args
+
+        if(not args.get('session') ):
+            abort(403)
+
+        if(data.get('_id')):
+            _id = ObjectId(data['_id'])
+        else:
+            _id = ObjectId()
+
+        data['_id'] = _id
+
+        if(data.get('date')):
+            data['date'] = datetime.fromisoformat(data['date'])
+        else:
+            data['date'] = datetime.utcnow()
+
+        data['session'] = ObjectId(args['session'])
+
+        query = {
+            '_id' : _id
+        }
+
+        document = mongo['incomes'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
+
+        return document
 
     def get_payments(self):
         data = request.args
@@ -142,6 +205,35 @@ class Methods():
 
         return list(documents)
 
+    def save_payment(self):
+        data = request.json
+        args = request.args
+
+        if(not args.get('session') ):
+            abort(403)
+
+        if(data.get('_id')):
+            _id = ObjectId(data['_id'])
+        else:
+            _id = ObjectId()
+
+        data['_id'] = _id
+
+        if(data.get('date')):
+            data['date'] = datetime.fromisoformat(data['date'])
+        else:
+            data['date'] = datetime.utcnow()
+
+        data['session'] = ObjectId(args['session'])
+
+        query = {
+            '_id' : _id
+        }
+
+        document = mongo['payments'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
+
+        return document
+
     def get_card_payments(self):
         data = request.args
 
@@ -157,6 +249,35 @@ class Methods():
         documents = mongo['card_payments'].find(query).sort([("date", 1)])
 
         return list(documents)
+
+    def save_card_payment(self):
+        data = request.json
+        args = request.args
+
+        if(not args.get('session') ):
+            abort(403)
+
+        if(data.get('_id')):
+            _id = ObjectId(data['_id'])
+        else:
+            _id = ObjectId()
+
+        data['_id'] = _id
+
+        if(data.get('date')):
+            data['date'] = datetime.fromisoformat(data['date'])
+        else:
+            data['date'] = datetime.utcnow()
+
+        data['session'] = ObjectId(args['session'])
+
+        query = {
+            '_id' : _id
+        }
+
+        document = mongo['card_payments'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
+
+        return document
 
     def get_product(self):
         data = request.args
@@ -222,7 +343,7 @@ class Methods():
             'session' : ObjectId(args['session'])
         }
 
-        if(data.get('canceled') and data['canceled']):
+        if(not data.get('canceled') or data['canceled'] == False):
             ticket = mongo['sales'].find({"ticket" : { '$exists': True }}).count()+1
 
             data['ticket'] = ticket
@@ -238,6 +359,19 @@ class Methods():
         data['date'] = datetime.utcnow()
 
         document = mongo['sales'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
+
+        for card in document['card']:
+            data = {
+                'sale' : document['_id'],
+                'amount' : card['amount'],
+                'operation' : card['operation'],
+                'date' : document['date'],
+                'commission' : card['commission'],
+                'percent' : 5,
+                'session' : document['session']
+            }
+
+            mongo['card_payments'].insert(data)
 
         return document
 
