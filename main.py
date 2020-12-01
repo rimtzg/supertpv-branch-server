@@ -116,7 +116,7 @@ def first_start():
     # thread.start()
 
     thread = threading.Thread(target=get_updates)
-    # thread.start()
+    thread.start()
 
     pass
 
