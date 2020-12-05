@@ -472,3 +472,55 @@ class Sync(Server):
                 db.Sales.find_one_and_update({'_id' : sale['_id'] }, {'$set' : {'uploaded' : True}})
 
         pass
+
+
+    def upload_recharges(self):
+        logging.info('Upload recharges')
+
+        server = app_config['API']['URL']
+
+        logging.info(server)
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        logging.info(db)
+
+        if not(self.token):
+            self.login()
+
+        logging.info(self.token)
+
+        if(db and self.token):
+            date = datetime.datetime.now() - datetime.timedelta(days=30)
+
+            query = {
+                'date' : { '$gte' : date },
+            }
+
+            logging.info(query)
+
+            headers = {
+                'Token' : self.token,
+                'Content-Type' : 'application/json'
+            }
+
+            logging.info(headers)
+
+            recharges = db.Recharges.find(query).sort([("date", -1)])
+
+            for recharge in recharges:
+                logging.info(recharge)
+
+                url = '{}/recharges/{}'.format( server, recharge['_id'] )
+                logging.info(url)
+
+                try:
+                    response = requests.put(url, data=DateTimeEncoder().encode(recharge), headers=headers)
+                except:
+                    logging.exception('Error valuating data on modify')
+
+        pass
+
