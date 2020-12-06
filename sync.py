@@ -494,7 +494,7 @@ class Sync(Server):
         logging.info(self.token)
 
         if(db and self.token):
-            date = datetime.datetime.now() - datetime.timedelta(days=30)
+            date = datetime.datetime.now() - datetime.timedelta(days=2)
 
             query = {
                 'date' : { '$gte' : date },
