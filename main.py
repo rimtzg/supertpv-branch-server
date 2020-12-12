@@ -103,7 +103,7 @@ def get_updates():
         sync.get_cashiers(DATE)
 
         sync.upload_session()
-        sync.upload_sales()
+        # sync.upload_sales()
 
         DATE = NEW_DATE
         #save_config_file()
