@@ -10,6 +10,6 @@ cp -n $SNAP/app/app_config.ini $SNAP_COMMON/app_config.ini
 
 #exec "$SNAP/bin/gunicorn" --chdir "$SNAP/app" --config "$SNAP_COMMON/gunicorn.cfg" wsgi:app "$@"
 
-exec "$SNAP/bin/gunicorn" --chdir "$SNAP/app" wsgi:app "$@" -t 240 --worker-class eventlet
+exec "$SNAP/bin/gunicorn" --chdir "$SNAP/app" --bind 127.0.0.1:8000 wsgi:app "$@" -t 240 --worker-class eventlet
 # cd $SNAP_COMMON
 # python3 "$SNAP/app/main.py"
