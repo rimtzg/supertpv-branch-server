@@ -445,7 +445,15 @@ class Methods():
 
         data['num_of_products'] = num_of_products
         data['date'] = datetime.utcnow()
-        data['cashier'] = ObjectId(args['cashier'])
+        # data['cashier_id'] = ObjectId(args['cashier'])
+
+        cashier = mongo['cashiers'].find_one({'_id' : ObjectId(args['cashier'])})
+
+        if not(cashier):
+            abort(401)
+
+        data['cashier_id'] = cashier['_id']
+        data['cashier_name'] = cashier['name']
 
         document = mongo['sales'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
 
