@@ -62,6 +62,78 @@ class Methods():
 
         return session
 
+    def close_session(self):
+        args = request.args
+
+        if(not args.get('session')):
+            abort(403)
+
+        _id = ObjectId(args['session'])
+
+        query = {
+            '_id' : _id
+        }
+
+        initial_money = 0
+
+        sales = mongo['sales'].find({'session' : _id})
+        
+        total_sales = 0
+        for sale in sales:
+            total_sales += sale['total']
+        
+        num_of_sales = sales.count()
+
+        incomes = mongo['incomes'].find({'session' : _id})
+        
+        total_incomes = 0
+        for income in incomes:
+            total_incomes += income['amount']
+
+        payments = mongo['payments'].find({'session' : _id})
+
+        total_payments = 0
+        for payment in payments:
+            total_payments += payment['amount']
+
+        deposits = mongo['deposits'].find({'session' : _id})
+
+        total_deposits = 0
+        for deposit in deposits:
+            total_deposits += deposit['total']
+
+        returns = mongo['returns'].find({'session' : _id})
+
+        total_returns = 0
+        for retur in returns:
+            total_returns += retur['total']
+
+        card_payments = mongo['card_payments'].find({'session' : _id})
+
+        total_card_payments = 0
+        for card_payment in card_payments:
+            total_card_payments += card_payment['total']
+
+        difference = total_deposits + total_returns + total_payments + total_card_payments - initial_money - total_sales - total_incomes
+
+        end_date = datetime.utcnow()
+
+        data = {
+            'total_sales' : total_sales,
+            'num_of_sales' : num_of_sales,
+            'total_incomes' : total_incomes,
+            'total_payments' : total_payments,
+            'total_deposits' : total_deposits,
+            'total_returns' : total_returns,
+            'total_card_payments' : total_card_payments,
+            'difference' : difference,
+            'closed' : True
+        }
+
+        session = mongo['sessions'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
+
+        return session
+
     def get_sales(self):
         data = request.args
 
@@ -457,20 +529,22 @@ class Methods():
 
         document = mongo['sales'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
 
-        for card in document['card']:
-            data = {
-                'sale' : document['_id'],
-                'amount' : card['amount'],
-                'operation' : card['operation'],
-                'date' : document['date'],
-                'commission' : card['commission'],
-                'percent' : 5,
-                'session' : document['session']
-            }
+        if(document.get('card')):
+            for card in document['card']:
+                data = {
+                    'sale' : document['_id'],
+                    'amount' : card['amount'],
+                    'operation' : card['operation'],
+                    'date' : document['date'],
+                    'commission' : card['commission'],
+                    'percent' : 5,
+                    'session' : document['session']
+                }
 
-            mongo['card_payments'].insert(data)
+                mongo['card_payments'].insert(data)
 
         return document
+
 
 
 

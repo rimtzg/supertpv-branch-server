@@ -21,6 +21,10 @@ def sessions():
 def new_session():
     return jsonify(Methods().new_session())
 
+@app.route('/session/close', methods=['GET'])
+def close_session():
+    return jsonify(Methods().close_session())
+
 @app.route('/sales', methods=['GET'])
 def get_sales():
     return jsonify(Methods().get_sales())
