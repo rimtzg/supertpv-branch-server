@@ -42,6 +42,22 @@ class Methods():
 
         return list(sessions)
 
+    def get_session(self):
+        args = request.args
+
+        if(not args.get('session')):
+            abort(403)
+
+        _id = ObjectId(args['session'])
+
+        query = {
+            '_id' : _id
+        }
+
+        session = mongo['sessions'].find_one( query )
+
+        return session
+
     def new_session(self):
         data = request.args
 
@@ -59,6 +75,23 @@ class Methods():
         }
 
         session = mongo['sessions'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
+
+        return session
+
+    def save_session(self):
+        args = request.args
+        data = request.json
+
+        if(not args.get('session')):
+            abort(403)
+
+        _id = ObjectId(args['session'])
+
+        query = {
+            '_id' : _id
+        }
+
+        session = mongo['sessions'].find_one_and_update(query, {"$set": data}, return_document=ReturnDocument.AFTER)
 
         return session
 
@@ -127,6 +160,7 @@ class Methods():
             'total_returns' : total_returns,
             'total_card_payments' : total_card_payments,
             'difference' : difference,
+            'end_date' : end_date,
             'closed' : True
         }
 

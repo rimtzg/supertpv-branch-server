@@ -102,7 +102,8 @@ def get_updates():
         sync.get_volume_discount(DATE)
         sync.get_cashiers(DATE)
 
-        sync.upload_session()
+        sync.upload_closed_sessions()
+        sync.upload_actual_session()
         # sync.upload_sales()
 
         DATE = NEW_DATE
@@ -117,7 +118,7 @@ def first_start():
     # thread.start()
 
     thread = threading.Thread(target=get_updates)
-    thread.start()
+    # thread.start()
 
     pass
 

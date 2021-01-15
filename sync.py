@@ -260,7 +260,58 @@ class Sync(Server):
                         _id = ObjectId( cashier['_id'] )
                         db.cashiers.find_one_and_update({'_id' : _id }, {'$set' : schema_cashier.validate(cashier)}, upsert=True )
 
-    def upload_session(self):
+    def upload_closed_sessions(self):
+        logging.info('Upload closed sessions')
+
+        server = app_config['API']['URL']
+        logging.info(server)
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        logging.info(db)
+
+        if not(self.token):
+            self.login()
+
+        logging.info(self.token)
+
+        if(db and self.token):
+            query = {
+                'uploaded' : { '$ne' : True },
+                'closed' : True
+            }
+
+            logging.info(query)
+
+            headers = {
+                'Token' : self.token,
+                'Content-Type' : 'application/json'
+            }
+
+            logging.info(headers)
+
+            sessions = db.sessions.find(query).sort([("start_date", -1)]).limit(10)
+
+            logging.info(sessions.count())
+
+            for session in sessions:
+                logging.info(session)
+
+                url = '{}/sessions/{}'.format( server, session['_id'] )
+                logging.info(url)
+
+                try:
+                    response = requests.put(url, data=DateTimeEncoder().encode(session), headers=headers)
+                except:
+                    logging.exception('Error valuating data on modify')
+
+                if(response.status_code == requests.codes.ok):
+                    db.sessions.find_one_and_update({'_id' : session['_id']}, {'$set' : {'uploaded' : True}})
+
+    def upload_actual_session(self):
         logging.info('Upload sessions')
 
         server = app_config['API']['URL']
@@ -280,11 +331,9 @@ class Sync(Server):
         logging.info(self.token)
 
         if(db and self.token):
-            date = datetime.datetime.now() - datetime.timedelta(days=2)
 
             query = {
-                'uploaded' : { '$ne' : True },
-                'start' : { '$gte' : date }
+                'closed' : { '$ne' : True }
             }
 
             logging.info(query)
@@ -296,87 +345,74 @@ class Sync(Server):
 
             logging.info(headers)
 
-            sessions = db.Sessions.find(query).sort([("start", -1)]).limit(10)
+            sessions = db.sessions.find(query).sort([("start", -1)]).limit(10)
 
             logging.info(sessions)
 
             for session in sessions:
+                _id = session['_id']
 
                 logging.info(session)
 
-                _id = session['_id']
-                initial_money = session['initial_money']
+                url = '{}/sessions/{}'.format( server, _id )
+                logging.info(url)
 
-                start_date = session['start']
-                if(session.get('end')):
-                    end_date = session['end']
-                else:
-                    end_date = None
+                initial_money = 0
 
-                sales = db.Sales.find({'session': session['_id'], 'canceled' : { '$ne' : True }})
+                sales = mongo['sales'].find({'session' : _id})
+                
                 total_sales = 0
                 for sale in sales:
                     total_sales += sale['total']
+                
+                num_of_sales = sales.count()
 
-                money_movements = db.MoneyMovements.find({'session': session['_id']})
+                incomes = mongo['incomes'].find({'session' : _id})
+                
                 total_incomes = 0
-                total_expenses = 0
-                for money in money_movements:
-                    if(money['type'] == 'out'):
-                        total_expenses += money['amount']
-                    else:
-                        total_incomes += money['amount']
+                for income in incomes:
+                    total_incomes += income['amount']
 
-                logging.info(total_incomes)
-                logging.info(total_expenses)
+                payments = mongo['payments'].find({'session' : _id})
 
-                deposits = db.Deposits.find({'session._id': session['_id']})
+                total_payments = 0
+                for payment in payments:
+                    total_payments += payment['amount']
+
+                deposits = mongo['deposits'].find({'session' : _id})
+
                 total_deposits = 0
                 for deposit in deposits:
                     total_deposits += deposit['total']
 
-                logging.info(total_deposits)
+                returns = mongo['returns'].find({'session' : _id})
 
-                card_payments = db.CardPayments.find({'session._id': session['_id']})
-                total_card_payments = 0
-                for payment in card_payments:
-                    total_card_payments += payment['amount'] - payment['commission']
-
-                logging.info(total_card_payments)
-                
-                returns = db.Returns.find({'session._id': session['_id']})
                 total_returns = 0
-                for ret in returns:
-                    total_returns += ret['total']
+                for retur in returns:
+                    total_returns += retur['total']
 
-                logging.info(total_returns)
+                card_payments = mongo['card_payments'].find({'session' : _id})
 
-                difference = total_deposits + total_returns + total_expenses + total_card_payments - initial_money - total_sales - total_incomes
+                total_card_payments = 0
+                for card_payment in card_payments:
+                    total_card_payments += card_payment['total']
 
-                logging.info(difference)
-                
+                difference = total_deposits + total_returns + total_payments + total_card_payments - initial_money - total_sales - total_incomes
+
                 data = {
-                    '_id'                 : _id,
-                    'initial_money'       : initial_money,
-                    'total_sales'         : total_sales,
-                    'num_of_sales'        : len(session['sales']),
-                    'total_incomes'       : total_incomes,
-                    'total_expenses'      : total_expenses,
-                    'total_deposits'      : total_deposits,
-                    'total_returns'       : total_returns,
+                    '_id' : _id,
+                    'start_date' : session['start_date'],
+                    'cashier' : session['cashier'],
+                    'total_sales' : total_sales,
+                    'num_of_sales' : num_of_sales,
+                    'total_incomes' : total_incomes,
+                    'total_payments' : total_payments,
+                    'total_deposits' : total_deposits,
+                    'total_returns' : total_returns,
                     'total_card_payments' : total_card_payments,
-                    'difference'          : difference,
-
-                    'start_date'          : start_date,
-                    'end_date'            : end_date,
-
-                    'cashier'             : session['user_id']
+                    'difference' : difference,
+                    'closed' : False
                 }
-
-                logging.info(data)
-
-                url = '{}/sessions/{}'.format( server, session['_id'] )
-                logging.info(url)
 
                 try:
                     response = requests.put(url, data=DateTimeEncoder().encode(data), headers=headers)
@@ -419,7 +455,7 @@ class Sync(Server):
 
             logging.info(headers)
 
-            sales = db.Sales.find(query).sort([("date", -1)]).limit(10)
+            sales = db.sales.find(query).sort([("date", -1)]).limit(10)
 
             logging.info(sales)
 
@@ -427,45 +463,45 @@ class Sync(Server):
 
                 logging.info(sale)
 
-                products = []
+                # products = []
 
-                for prod in sale['products']:
-                    product = {
-                        '_id' : sale['products'][prod]['_id'],
-                        'code' : sale['products'][prod]['code'],
-                        'name' : sale['products'][prod]['name'],
-                        'cost' : sale['products'][prod]['cost'],
-                        'price' : sale['products'][prod]['price'],
-                        'amount' : sale['products'][prod]['amount'],
-                        'subtotal' : sale['products'][prod]['subtotal'],
-                    }
+                # for prod in sale['products']:
+                #     product = {
+                #         '_id' : sale['products'][prod]['_id'],
+                #         'code' : sale['products'][prod]['code'],
+                #         'name' : sale['products'][prod]['name'],
+                #         'cost' : sale['products'][prod]['cost'],
+                #         'price' : sale['products'][prod]['price'],
+                #         'amount' : sale['products'][prod]['amount'],
+                #         'subtotal' : sale['products'][prod]['subtotal'],
+                #     }
 
-                    products.append(product)
+                #     products.append(product)
 
-                if(sale.get('ticket')):
-                    ticket = sale['ticket']
-                else:
-                    ticket = None
+                # if(sale.get('ticket')):
+                #     ticket = sale['ticket']
+                # else:
+                #     ticket = None
 
-                data = {
-                    '_id' : sale['_id'],
-                    'date' : sale['date'],
-                    'cashier_id' : sale['cashier_id'],
-                    'cashier_name' : sale['cashier_name'],
-                    'canceled' : sale['canceled'],
-                    'session_id' : sale['session'],
-                    'total' : sale['total'],
-                    'ticket' : ticket,
-                    'products' : products
-                }
+                # data = {
+                #     '_id' : sale['_id'],
+                #     'date' : sale['date'],
+                #     'cashier_id' : sale['cashier_id'],
+                #     'cashier_name' : sale['cashier_name'],
+                #     'canceled' : sale['canceled'],
+                #     'session_id' : sale['session'],
+                #     'total' : sale['total'],
+                #     'ticket' : ticket,
+                #     'products' : products
+                # }
 
-                logging.info(data)
+                # logging.info(data)
 
                 url = '{}/sales/{}'.format( server, sale['_id'] )
                 logging.info(url)
 
                 try:
-                    response = requests.put(url, data=DateTimeEncoder().encode(data), headers=headers)
+                    response = requests.put(url, data=DateTimeEncoder().encode(sale), headers=headers)
                 except:
                     logging.exception('Error valuating data on modify')
 

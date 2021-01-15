@@ -17,9 +17,17 @@ def login():
 def sessions():
     return jsonify(Methods().sessions())
 
+@app.route('/session/', methods=['GET'])
+def get_session():
+    return jsonify(Methods().get_session())
+
 @app.route('/session/new', methods=['GET'])
 def new_session():
     return jsonify(Methods().new_session())
+
+@app.route('/session/save', methods=['POST'])
+def save_session():
+    return jsonify(Methods().save_session())
 
 @app.route('/session/close', methods=['GET'])
 def close_session():
