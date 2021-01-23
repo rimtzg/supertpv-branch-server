@@ -3,7 +3,7 @@ from flask_httpauth import HTTPBasicAuth
 from flask_script import Manager
 from flask_cors import CORS
 from datetime import date, datetime
-from backports.datetime_fromisoformat import MonkeyPatch
+# from backports.datetime_fromisoformat import MonkeyPatch
 import logging
 from time import sleep
 import threading
@@ -37,7 +37,7 @@ DELAY_TIME = 10
 #                                                                      #
 ########################################################################
 
-MonkeyPatch.patch_fromisoformat()
+# MonkeyPatch.patch_fromisoformat()
 
 app = Flask(__name__)
 cors = CORS(app)

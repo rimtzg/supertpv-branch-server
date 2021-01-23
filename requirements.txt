@@ -6,4 +6,3 @@ schema
 gunicorn[eventlet]
 flask_script
 flask_cors
-backports-datetime-fromisoformat
