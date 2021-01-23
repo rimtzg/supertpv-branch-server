@@ -85,12 +85,12 @@ sync = Sync()
 #     pass
 
 def get_updates():
-    sync.get_products()
-    sync.get_prices()
-    sync.get_discounts()
-    sync.get_volume_discount()
-    sync.get_cashiers()
-    sync.upload_recharges()
+    # sync.get_products()
+    # sync.get_prices()
+    # sync.get_discounts()
+    # sync.get_volume_discount()
+    # sync.get_cashiers()
+    # sync.upload_recharges()
     
     DATE = datetime.utcnow().isoformat()
 
@@ -99,17 +99,17 @@ def get_updates():
     while True:
         NEW_DATE = datetime.utcnow().isoformat()
         
-        sync.get_products(DATE)
-        sync.get_prices(DATE)
-        sync.get_discounts(DATE)
-        sync.get_volume_discount(DATE)
-        sync.get_cashiers(DATE)
+        # sync.get_products(DATE)
+        # sync.get_prices(DATE)
+        # sync.get_discounts(DATE)
+        # sync.get_volume_discount(DATE)
+        # sync.get_cashiers(DATE)
         sync.get_orders()
 
         #Sessions
-        sync.upload_closed_sessions()
-        sync.upload_actual_session()
-        sync.upload_old_sessions()
+        # sync.upload_closed_sessions()
+        # sync.upload_actual_session()
+        # sync.upload_old_sessions()
 
         DATE = NEW_DATE
         #save_config_file()

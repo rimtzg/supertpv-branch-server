@@ -3,7 +3,7 @@ from flask_script import Server
 import json
 from json import JSONEncoder
 import requests
-import datetime
+from datetime import datetime, date, timedelta
 from bson.objectid import ObjectId
 import logging
 from time import sleep
@@ -24,7 +24,7 @@ from schemas.orders import schema as schema_order
 class DateTimeEncoder(JSONEncoder):
         #Override the default method
         def default(self, obj):
-            if isinstance(obj, (datetime.date, datetime.datetime)):
+            if isinstance(obj, (date, datetime)):
                 return obj.isoformat()
             if isinstance(obj, ObjectId):
                 return str(obj)
@@ -285,6 +285,7 @@ class Sync(Server):
 
                 for order in orders:
                     _id = ObjectId( order['_id'] )
+                    order['date'] = datetime.strptime(order['date'], '%Y-%m-%dT%H:%M:%S.%f')
 
                     db.orders.find_one_and_update({'_id' : _id }, {'$set' : schema_order.validate(order)}, upsert=True )
 
@@ -593,7 +594,7 @@ class Sync(Server):
         logging.info(self.token)
 
         if(db and self.token):
-            date = datetime.datetime.now() - datetime.timedelta(days=2)
+            date = datetime.now() - timedelta(days=2)
 
             query = {
                 'date' : { '$gte' : date },
@@ -684,7 +685,7 @@ class Sync(Server):
         logging.info(self.token)
 
         if(db and self.token):
-            date = datetime.datetime.now() - datetime.timedelta(days=2)
+            date = datetime.now() - timedelta(days=2)
 
             query = {
                 'date' : { '$gte' : date },
