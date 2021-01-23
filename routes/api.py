@@ -94,6 +94,10 @@ def get_product():
 def get_products():
     return jsonify(Methods().get_products())
 
+@app.route('/orders', methods=['GET'])
+def get_orders():
+    return jsonify(Methods().get_orders())
+
 
 
 

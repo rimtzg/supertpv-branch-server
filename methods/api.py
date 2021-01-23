@@ -579,6 +579,15 @@ class Methods():
 
         return document
 
+    def get_orders(self):
+        query = {
+            'active' : True
+        }
+
+        documents = mongo['orders'].find(query).sort([("date", 1)])
+
+        return list(documents)
+
 
 
 

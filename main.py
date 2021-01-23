@@ -101,10 +101,12 @@ def get_updates():
         sync.get_discounts(DATE)
         sync.get_volume_discount(DATE)
         sync.get_cashiers(DATE)
+        sync.get_orders()
 
+        #Sessions
         sync.upload_closed_sessions()
         sync.upload_actual_session()
-        # sync.upload_sales()
+        sync.upload_old_sessions()
 
         DATE = NEW_DATE
         #save_config_file()
@@ -118,7 +120,7 @@ def first_start():
     # thread.start()
 
     thread = threading.Thread(target=get_updates)
-    # thread.start()
+    thread.start()
 
     pass
 
