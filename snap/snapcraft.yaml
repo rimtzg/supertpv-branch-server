@@ -4,7 +4,6 @@ version: '0.2' # just for humans, typically '1.2+git' or '1.3.2'
 summary: Bracnh server for SuperTPV
 description: |
   Bracnh server for SuperTPV
-
 grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict # use 'strict' once you have the right plugs and slots
 architectures: [amd64]
@@ -21,11 +20,10 @@ parts:
     source: .
     python-version: python3
     requirements: requirements.txt
-    # stage-packages: [python3.7]
+    #stage-packages: [gir1.2-gtk-3.0, python3-gi]
     install: |
       mkdir -p $SNAPCRAFT_PART_INSTALL/app
       cp -r ./* $SNAPCRAFT_PART_INSTALL/app/
-
   wrappers:
     plugin: dump
     source: snap_wrap/
