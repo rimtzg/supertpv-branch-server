@@ -1,15 +1,15 @@
 name: supertpv-branch-server
 #base: core18 # the base snap is the execution environment for this snap
-version: '0.2' # just for humans, typically '1.2+git' or '1.3.2'
-summary: Bracnh server for SuperTPV
+version: '0.3' # just for humans, typically '1.2+git' or '1.3.2'
+summary: Bracnh Server for SuperTPV
 description: |
-  Bracnh server for SuperTPV
+  Bracnh Server for SuperTPV
 grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict # use 'strict' once you have the right plugs and slots
 architectures: [amd64]
 
 apps:
-  server:
+  supertpv-branch-server:
     command: wrappers/run
     daemon: simple
     plugs: [network, network-bind]
