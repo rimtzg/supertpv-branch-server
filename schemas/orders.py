@@ -9,7 +9,7 @@ schema = Schema({
     '_id'           : Use(ObjectId),
     'client_id'     : Use(ObjectId),
     'client_name'   : Use(str.lower),
-    'date'          : datetime,
+    'date'          : Use(datetime.fromisoformat),
 
     Optional('active', default=True) : Use(bool),
     
