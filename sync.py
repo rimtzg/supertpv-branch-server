@@ -331,7 +331,9 @@ class Sync(Server):
 
                 _id = session['_id']
 
-                initial_money = session['initial_money']
+                initial_money = 0
+                if(session.get('initial_money')):
+                    initial_money = session['initial_money']
 
                 start_date = session['start']
                 if(session.get('end')):
