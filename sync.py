@@ -651,7 +651,8 @@ class Sync(Server):
                     'session_id' : sale['session'],
                     'total' : sale['total'],
                     'ticket' : ticket,
-                    'products' : products
+                    'products' : products,
+                    'num_of_products' : len(products)
                 }
 
                 logging.info(data)
