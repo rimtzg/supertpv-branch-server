@@ -350,7 +350,7 @@ class Sync(Server):
                 total_incomes = 0
                 total_expenses = 0
                 for money in money_movements:
-                    if(money['type'] == 'out'):
+                    if(money.get('type') and money['type'] == 'out'):
                         total_expenses += money['amount']
                     else:
                         total_incomes += money['amount']
@@ -575,8 +575,8 @@ class Sync(Server):
                 except:
                     logging.exception('Error valuating data on modify')
 
-    def upload_sales(self):
-        logging.info('Upload sales')
+    def upload_old_sales(self):
+        logging.info('Upload OLD sales')
 
         server = app_config['API']['URL']
 
@@ -595,11 +595,9 @@ class Sync(Server):
         logging.info(self.token)
 
         if(db and self.token):
-            date = datetime.datetime.now() - datetime.timedelta(days=2)
-
             query = {
-                'date' : { '$gte' : date },
-                'uploaded' : { '$ne' : True }
+                'uploaded' : { '$ne' : True },
+                'closed' : True
             }
 
             logging.info(query)
@@ -611,7 +609,7 @@ class Sync(Server):
 
             logging.info(headers)
 
-            sales = db.sales.find(query).sort([("date", -1)]).limit(10)
+            sales = db.Sales.find(query).sort([("date", -1)]).limit(1)
 
             logging.info(sales)
 
@@ -619,50 +617,57 @@ class Sync(Server):
 
                 logging.info(sale)
 
-                # products = []
+                products = []
 
-                # for prod in sale['products']:
-                #     product = {
-                #         '_id' : sale['products'][prod]['_id'],
-                #         'code' : sale['products'][prod]['code'],
-                #         'name' : sale['products'][prod]['name'],
-                #         'cost' : sale['products'][prod]['cost'],
-                #         'price' : sale['products'][prod]['price'],
-                #         'amount' : sale['products'][prod]['amount'],
-                #         'subtotal' : sale['products'][prod]['subtotal'],
-                #     }
+                for prod in sale['products']:
+                    product = {
+                        '_id' : sale['products'][prod]['_id'],
+                        'code' : sale['products'][prod]['code'],
+                        'name' : sale['products'][prod]['name'],
+                        'cost' : sale['products'][prod]['cost'],
+                        'price' : sale['products'][prod]['price'],
+                        'amount' : sale['products'][prod]['amount'],
+                        'subtotal' : sale['products'][prod]['subtotal'],
+                    }
 
-                #     products.append(product)
+                    products.append(product)
 
-                # if(sale.get('ticket')):
-                #     ticket = sale['ticket']
-                # else:
-                #     ticket = None
+                if(sale.get('ticket')):
+                    ticket = sale['ticket']
+                else:
+                    ticket = None
 
-                # data = {
-                #     '_id' : sale['_id'],
-                #     'date' : sale['date'],
-                #     'cashier_id' : sale['cashier_id'],
-                #     'cashier_name' : sale['cashier_name'],
-                #     'canceled' : sale['canceled'],
-                #     'session_id' : sale['session'],
-                #     'total' : sale['total'],
-                #     'ticket' : ticket,
-                #     'products' : products
-                # }
+                if(sale.get('canceled')):
+                    canceled = sale['canceled']
+                else:
+                    canceled = None
 
-                # logging.info(data)
+                data = {
+                    '_id' : sale['_id'],
+                    'date' : sale['date'],
+                    'cashier_id' : sale['cashier_id'],
+                    'cashier_name' : sale['cashier_name'],
+                    'canceled' : canceled,
+                    'session_id' : sale['session'],
+                    'total' : sale['total'],
+                    'ticket' : ticket,
+                    'products' : products
+                }
+
+                logging.info(data)
 
                 url = '{}/sales/{}'.format( server, sale['_id'] )
                 logging.info(url)
 
+                response = None
                 try:
-                    response = requests.put(url, data=DateTimeEncoder().encode(sale), headers=headers)
+                    response = requests.put(url, data=DateTimeEncoder().encode(data), headers=headers)
                 except:
                     logging.exception('Error valuating data on modify')
 
-                db.Sales.find_one_and_update({'_id' : sale['_id'] }, {'$set' : {'uploaded' : True}})
-
+                if(response and response.status_code == requests.codes.ok):
+                    db.Sales.find_one_and_update({'_id' : sale['_id']}, {'$set' : {'uploaded' : True}})
+                    
         pass
 
 

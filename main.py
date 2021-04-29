@@ -103,10 +103,11 @@ def get_updates():
         sync.get_cashiers(DATE)
         sync.get_orders()
 
-        #Sessions
+        # UPLOAD #
         sync.upload_closed_sessions()
         sync.upload_actual_session()
         sync.upload_old_sessions()
+        sync.upload_old_sales()
 
         DATE = NEW_DATE
         #save_config_file()
