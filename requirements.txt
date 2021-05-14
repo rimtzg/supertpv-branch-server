@@ -7,3 +7,4 @@ gunicorn[eventlet]
 flask_script
 flask_cors
 pytz
+eventlet==0.30.0
