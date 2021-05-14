@@ -20,6 +20,9 @@ from schemas.cashiers import schema as schema_cashier
 from schemas.sessions import schema as schema_session
 from schemas.orders import schema as schema_order
 
+import pytz
+local_time = pytz.timezone("America/Mexico_City")
+
 # subclass JSONEncoder
 class DateTimeEncoder(JSONEncoder):
         #Override the default method
@@ -335,16 +338,20 @@ class Sync(Server):
                 if(session.get('initial_money')):
                     initial_money = session['initial_money']
 
-                start_date = session['start']
+                #local_datetime = local_time.localize(naive_datetime, is_dst=None)
+                start_date = local_time.localize(session['start'], is_dst=None).astimezone(pytz.utc)
                 if(session.get('end')):
-                    end_date = session['end']
+                    end_date = local_time.localize(session['end'], is_dst=None).astimezone(pytz.utc)
                 else:
                     end_date = None
 
                 sales = db.Sales.find({'session': session['_id'], 'canceled' : { '$ne' : True }})
                 total_sales = 0
                 for sale in sales:
-                    total_sales += sale['total']
+                    if(sale.get('total')):
+                        total_sales += sale['total']
+                    else:
+                        total_sales += 0
 
                 money_movements = db.MoneyMovements.find({'session': session['_id']})
                 total_incomes = 0
@@ -620,14 +627,43 @@ class Sync(Server):
                 products = []
 
                 for prod in sale['products']:
+                    
+                    _id = None
+                    if(sale['products'][prod].get('_id')):
+                        _id = sale['products'][prod]['_id']
+
+                    code = ''
+                    if(sale['products'][prod].get('code')):
+                        code = sale['products'][prod]['code']
+
+                    name = ''
+                    if(sale['products'][prod].get('name')):
+                        name = sale['products'][prod]['name']
+
+                    cost = 0
+                    if(sale['products'][prod].get('cost')):
+                        cost = sale['products'][prod]['cost']
+
+                    price = 0
+                    if(sale['products'][prod].get('price')):
+                        price = sale['products'][prod]['price']
+
+                    amount = 0
+                    if(sale['products'][prod].get('amount')):
+                        amount = sale['products'][prod]['amount']
+
+                    subtotal = 0
+                    if(sale['products'][prod].get('subtotal')):
+                        subtotal = sale['products'][prod]['subtotal']
+
                     product = {
-                        '_id' : sale['products'][prod]['_id'],
-                        'code' : sale['products'][prod]['code'],
-                        'name' : sale['products'][prod]['name'],
-                        'cost' : sale['products'][prod]['cost'],
-                        'price' : sale['products'][prod]['price'],
-                        'amount' : sale['products'][prod]['amount'],
-                        'subtotal' : sale['products'][prod]['subtotal'],
+                        '_id' : _id,
+                        'code' : code,
+                        'name' : name,
+                        'cost' : cost,
+                        'price' : price,
+                        'amount' : amount,
+                        'subtotal' : subtotal,
                     }
 
                     products.append(product)
@@ -644,7 +680,7 @@ class Sync(Server):
 
                 data = {
                     '_id' : sale['_id'],
-                    'date' : sale['date'],
+                    'date' : local_time.localize(sale['date'], is_dst=None).astimezone(pytz.utc),
                     'cashier_id' : sale['cashier_id'],
                     'cashier_name' : sale['cashier_name'],
                     'canceled' : canceled,

@@ -6,3 +6,4 @@ schema
 gunicorn[eventlet]
 flask_script
 flask_cors
+pytz
