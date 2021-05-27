@@ -325,11 +325,9 @@ class Sync(Server):
 
             logging.info(headers)
 
-            sessions = db.Sessions.find(query).sort([("start", -1)]).limit(1)
+            session = db.Sessions.find_one(query, sort=[("start", -1)])
 
-            logging.info(sessions)
-
-            for session in sessions:
+            if(session):
                 logging.info(session)
 
                 _id = session['_id']
@@ -455,11 +453,9 @@ class Sync(Server):
 
             logging.info(headers)
 
-            sessions = db.sessions.find(query).sort([("start_date", -1)]).limit(10)
+            session = db.sessions.find_one(query, sort=[("start_date", -1)])
 
-            logging.info(sessions.count())
-
-            for session in sessions:
+            if(session):
                 logging.info(session)
 
                 url = '{}/sessions/{}'.format( server, session['_id'] )
@@ -473,6 +469,132 @@ class Sync(Server):
 
                 if(response and response.status_code == requests.codes.ok):
                     db.sessions.find_one_and_update({'_id' : session['_id']}, {'$set' : {'uploaded' : True}})
+
+    def upload_old_actual_session(self):
+        logging.info('Upload sessions')
+
+        server = app_config['API']['URL']
+
+        logging.info(server)
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        logging.info(db)
+
+        if not(self.token):
+            self.login()
+
+        logging.info(self.token)
+
+        if(db and self.token):
+
+            query = {
+                'closed' : { '$ne' : True }
+            }
+
+            logging.info(query)
+
+            headers = {
+                'Token' : self.token,
+                'Content-Type' : 'application/json'
+            }
+
+            logging.info(headers)
+
+            session = db.Sessions.find_one(query, sort=[("start", -1)])
+
+            if(session):
+                logging.info(session)
+
+                _id = session['_id']
+
+                initial_money = 0
+                if(session.get('initial_money')):
+                    initial_money = session['initial_money']
+
+                #local_datetime = local_time.localize(naive_datetime, is_dst=None)
+                start_date = local_time.localize(session['start'], is_dst=None).astimezone(pytz.utc)
+                if(session.get('end')):
+                    end_date = local_time.localize(session['end'], is_dst=None).astimezone(pytz.utc)
+                else:
+                    end_date = None
+
+                sales = db.Sales.find({'session': session['_id'], 'canceled' : { '$ne' : True }})
+                total_sales = 0
+                for sale in sales:
+                    if(sale.get('total')):
+                        total_sales += sale['total']
+                    else:
+                        total_sales += 0
+
+                money_movements = db.MoneyMovements.find({'session': session['_id']})
+                total_incomes = 0
+                total_expenses = 0
+                for money in money_movements:
+                    if(money.get('type') and money['type'] == 'out'):
+                        total_expenses += money['amount']
+                    else:
+                        total_incomes += money['amount']
+
+                logging.info(total_incomes)
+                logging.info(total_expenses)
+
+                deposits = db.Deposits.find({'session._id': session['_id']})
+                total_deposits = 0
+                for deposit in deposits:
+                    total_deposits += deposit['total']
+
+                logging.info(total_deposits)
+
+                card_payments = db.CardPayments.find({'session._id': session['_id']})
+                total_card_payments = 0
+                for payment in card_payments:
+                    total_card_payments += payment['amount'] - payment['commission']
+
+                logging.info(total_card_payments)
+                
+                returns = db.Returns.find({'session._id': session['_id']})
+                total_returns = 0
+                for ret in returns:
+                    total_returns += ret['total']
+
+                logging.info(total_returns)
+
+                difference = total_deposits + total_returns + total_expenses + total_card_payments - initial_money - total_sales - total_incomes
+
+                logging.info(difference)
+                
+                data = {
+                    '_id'                 : _id,
+                    'initial_money'       : initial_money,
+                    'total_sales'         : total_sales,
+                    'num_of_sales'        : len(session['sales']),
+                    'total_incomes'       : total_incomes,
+                    'total_payments'      : total_expenses,
+                    'total_deposits'      : total_deposits,
+                    'total_returns'       : total_returns,
+                    'total_card_payments' : total_card_payments,
+                    'difference'          : difference,
+
+                    'start_date'          : start_date,
+                    'end_date'            : end_date,
+
+                    'cashier'             : session['user_id']
+                }
+
+                logging.info(data)
+
+                url = '{}/sessions/{}'.format( server, session['_id'] )
+                logging.info(url)
+
+                response = None
+                try:
+                    response = requests.put(url, data=DateTimeEncoder().encode(data), headers=headers)
+                except:
+                    logging.exception('Error valuating data on modify')
 
     def upload_actual_session(self):
         logging.info('Upload sessions')
@@ -508,14 +630,12 @@ class Sync(Server):
 
             logging.info(headers)
 
-            sessions = db.sessions.find(query).sort([("start_date", -1)]).limit(10)
+            session = db.sessions.find_one(query, sort=[("start_date", -1)])
 
-            logging.info(sessions)
-
-            for session in sessions:
-                _id = session['_id']
-
+            if(session):
                 logging.info(session)
+
+                _id = session['_id']
 
                 url = '{}/sessions/{}'.format( server, _id )
                 logging.info(url)
@@ -616,12 +736,9 @@ class Sync(Server):
 
             logging.info(headers)
 
-            sales = db.Sales.find(query).sort([("date", -1)]).limit(1)
+            sale = db.Sales.find_one(query, sort=[("date", -1)])
 
-            logging.info(sales)
-
-            for sale in sales:
-
+            if(sale):
                 logging.info(sale)
 
                 products = []
@@ -704,8 +821,6 @@ class Sync(Server):
 
                 if(response and response.status_code == requests.codes.ok):
                     db.Sales.find_one_and_update({'_id' : sale['_id']}, {'$set' : {'uploaded' : True}})
-                    
-        pass
 
 
     def upload_recharges(self):
@@ -731,6 +846,7 @@ class Sync(Server):
             date = datetime.datetime.now() - datetime.timedelta(days=30)
 
             query = {
+                'uploaded' : { '$ne' : True },
                 'date' : { '$gte' : date },
             }
 
@@ -743,18 +859,22 @@ class Sync(Server):
 
             logging.info(headers)
 
-            recharges = db.Recharges.find(query).sort([("date", -1)])
+            recharge = db.Recharges.find_one(query, sort=[("date", -1)])
 
-            for recharge in recharges:
+            if(recharge):
                 logging.info(recharge)
 
                 url = '{}/recharges/{}'.format( server, recharge['_id'] )
                 logging.info(url)
 
+                response = None
                 try:
                     response = requests.put(url, data=DateTimeEncoder().encode(recharge), headers=headers)
                 except:
                     logging.exception('Error valuating data on modify')
+
+                if(response and response.status_code == requests.codes.ok):
+                    db.Recharges.find_one_and_update({'_id' : recharge['_id']}, {'$set' : {'uploaded' : True}})
 
         pass
 

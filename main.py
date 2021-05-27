@@ -87,7 +87,7 @@ def get_updates():
     sync.get_discounts()
     sync.get_volume_discount()
     sync.get_cashiers()
-    sync.upload_recharges()
+    # sync.upload_recharges()
     
     DATE = datetime.utcnow().isoformat()
 
@@ -107,7 +107,9 @@ def get_updates():
         sync.upload_closed_sessions()
         sync.upload_actual_session()
         sync.upload_old_sessions()
+        sync.upload_old_actual_session()
         sync.upload_old_sales()
+        sync.upload_recharges()
 
         DATE = NEW_DATE
         #save_config_file()
