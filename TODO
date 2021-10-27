@@ -5,3 +5,6 @@ gunicorn wsgi:app -t 240 --worker-class eventlet
 snapcraft upload --release=edge supertpv-branch-server
 
 snapcraft release supertpv-branch-server 389 stable
+
+
+Separate Methods, Routes, Syncs

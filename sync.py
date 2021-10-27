@@ -65,7 +65,9 @@ class Sync(Server):
         if(db):
             db.products.delete_many({})
 
-    def get_products(self, date=None):
+    def get_all_products(self):
+        logging.info('GET ALL PRODUCTS')
+
         server = app_config['API']['URL']
 
         try:
@@ -77,10 +79,43 @@ class Sync(Server):
             self.login()
 
         if(db and self.token):
-            if not(date):
-                url = '{}/products/'.format( server )
-            else:
-                url = '{}/products/?date={}'.format( server, date )
+            url = '{}/products/'.format( server )
+
+            logging.info(url)
+
+            headers = {
+                'Token' : self.token
+            }
+
+            try:
+                response = requests.get(url, headers=headers)
+            except:
+                response = None
+
+            if(response and response.status_code == requests.codes.ok):
+                db.products.delete_many({})
+
+                products = json.loads(response.text)
+                logging.info(len(products))
+
+                for product in products:
+                    _id = ObjectId( product['_id'] )
+                    db.products.find_one_and_update({'_id' : _id }, {'$set' : product_schema.validate(product)}, upsert=True )
+
+    def get_products(self, date):
+        server = app_config['API']['URL']
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        if not(self.token):
+            self.login()
+
+        if(db and self.token):
+            url = '{}/products/?date={}'.format( server, date )
+
             logging.info(url)
 
             headers = {
@@ -701,6 +736,56 @@ class Sync(Server):
                     response = requests.put(url, data=DateTimeEncoder().encode(data), headers=headers)
                 except:
                     logging.exception('Error valuating data on modify')
+
+    def upload_sales(self):
+        logging.info('Upload sales')
+
+        server = app_config['API']['URL']
+
+        logging.info(server)
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        logging.info(db)
+
+        if not(self.token):
+            self.login()
+
+        logging.info(self.token)
+
+        if(db and self.token):
+            query = {
+                'uploaded' : { '$ne' : True },
+            }
+
+            logging.info(query)
+
+            headers = {
+                'Token' : self.token,
+                'Content-Type' : 'application/json'
+            }
+
+            logging.info(headers)
+
+            sale = db.sales.find_one(query, sort=[("date", -1)])
+
+            if(sale):
+                logging.info(sale)
+
+                url = '{}/sales/{}'.format( server, sale['_id'] )
+                logging.info(url)
+
+                response = None
+                try:
+                    response = requests.put(url, data=DateTimeEncoder().encode(sale), headers=headers)
+                except:
+                    logging.exception('Error valuating data on modify')
+
+                if(response and response.status_code == requests.codes.ok):
+                    db.sales.find_one_and_update({'_id' : sale['_id']}, {'$set' : {'uploaded' : True}})
 
     def upload_old_sales(self):
         logging.info('Upload OLD sales')

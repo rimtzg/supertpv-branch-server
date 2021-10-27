@@ -493,9 +493,14 @@ class Methods():
 
         if(not data.get('name') ):
             abort(404)
+
+        search = data['name'].lower()
         
         query = {
-            'name': {'$regex': data['name']},
+            '$or' : [
+                { 'name': {'$regex': search} },
+                { 'code': {'$regex': search} },
+            ],
             'active' : True
         }
 
@@ -595,12 +600,14 @@ class Methods():
             'active' : True
         }
 
-        query['date'] = {
+        date = {
             '$gte' : start,
             '$lt' : end
         }
 
-        documents = mongo['orders'].find(query).sort([("date", 1)])
+        query['$or'] = [{'date' : date}, {'created' : date}]
+
+        documents = mongo['orders'].find(query).sort([("sended", 1)])
 
         return list(documents)
 
