@@ -14,7 +14,7 @@ schema = Schema({
     Optional('unit', default=None) : Use(ObjectId),
     'cost' : Use(float),
     Optional('profit', default=20) : Use(int),
-    'price' : Use(float),
+    Optional('price') : Use(float),
 
     Optional('round', default=True) : Use(bool),
     Optional('pin',   default=False) : Use(bool),
