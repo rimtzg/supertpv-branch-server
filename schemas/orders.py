@@ -9,9 +9,11 @@ schema = Schema({
     '_id'           : Use(ObjectId),
     'client_id'     : Use(ObjectId),
     'client_name'   : Use(str.lower),
-    Optional('date') : Use(datetime.fromisoformat),
     'number'        : Use(int),
     Optional('active', default=True) : Use(bool),
+    Optional('date', default=datetime.utcnow) : Use(datetime.fromisoformat),
+    Optional('created', default=datetime.utcnow) : Use(datetime.fromisoformat),
+    Optional('sended') : Use(datetime.fromisoformat),
     
     'categories' : [
         {
@@ -22,9 +24,9 @@ schema = Schema({
                     '_id'    : Use(ObjectId),
                     'code'   : Use(str.lower),
                     'name'   : Use(str.lower),
-                    'amount' : Or(Use(int), Use(float)),
+                    'amount' : Use(float),
                     'label'  : Use(str.lower),
-                    'price'  : Or(Use(int), Use(float))
+                    'price'  : Use(float)
                 }
             ]
         }

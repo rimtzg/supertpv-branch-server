@@ -600,12 +600,12 @@ class Methods():
             'active' : True
         }
 
-        date = {
+        query['date'] = {
             '$gte' : start,
             '$lt' : end
         }
 
-        query['$or'] = [{'date' : date}, {'created' : date}]
+        # query['$or'] = [{'date' : date}, {'created' : date}]
 
         documents = mongo['orders'].find(query).sort([("sended", 1)])
 
