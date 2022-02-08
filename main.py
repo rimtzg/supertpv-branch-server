@@ -10,7 +10,6 @@ import json
 from bson import ObjectId
 
 from config import app_config, save_config_file
-from sync import Sync
 
 from routes.config import app as config
 from routes.admin import app as admin
@@ -27,8 +26,6 @@ try:
 except:
     DEBUG = True
 SECRET_KEY = app_config['SERVER']['SECRET_KEY']
-
-DELAY_TIME = 10
 
 ########################################################################
 #                                                                      #
@@ -70,46 +67,33 @@ app.register_blueprint(api)
 #                                                                      #
 ########################################################################
 
-sync = Sync()
+    #     # UPLOAD #
+    #     sync.upload_closed_sessions()
+    #     sync.upload_actual_session()
+    #     sync.upload_sales()
+    #     sync.upload_old_sessions()
+    #     sync.upload_old_actual_session()
+    #     sync.upload_old_sales()
+    #     sync.upload_recharges()
 
-def get_updates():
-    DATE = datetime.utcnow().isoformat()
+    #     DATE = NEW_DATE
+    #     #save_config_file()
 
-    sync.get_all_products()
-    
-    # sleep(120)
+    #     sleep(DELAY_TIME)
 
-    while True:
-        NEW_DATE = datetime.utcnow().isoformat()
-        
-        sync.get_products(DATE)
-        sync.get_prices()
-        sync.get_discounts()
-        sync.get_volume_discount()
-        sync.get_cashiers()
-        sync.get_orders()
-
-        # UPLOAD #
-        sync.upload_closed_sessions()
-        sync.upload_actual_session()
-        sync.upload_sales()
-        sync.upload_old_sessions()
-        sync.upload_old_actual_session()
-        sync.upload_old_sales()
-        sync.upload_recharges()
-
-        DATE = NEW_DATE
-        #save_config_file()
-
-        sleep(DELAY_TIME)
+from syncs import sync_cashiers
+from syncs import sync_products
+from syncs import sync_volume_discounts
 
 @app.before_first_request
 def first_start():
-    # Sync().get_products()
-    # thread = threading.Thread(target=get_data)
-    # thread.start()
+    thread = threading.Thread(target=sync_cashiers)
+    thread.start()
 
-    thread = threading.Thread(target=get_updates)
+    thread = threading.Thread(target=sync_products)
+    thread.start()
+
+    thread = threading.Thread(target=sync_volume_discounts)
     thread.start()
 
     pass

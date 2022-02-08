@@ -549,10 +549,15 @@ class Methods():
 
         num_of_products = 0
         for product in data['products']:
+            if(product.get('amount')):
+                amount = product['amount']
+            else:
+                amount = 1
+
             if(product['scale']):
                 num_of_products += 1
             else:
-                num_of_products += product['amount']
+                num_of_products += amount
 
         data['num_of_products'] = num_of_products
         data['date'] = datetime.utcnow()

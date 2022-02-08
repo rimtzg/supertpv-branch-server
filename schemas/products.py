@@ -28,7 +28,8 @@ schema = Schema({
     Optional('visible', default=True) : Use(bool),
     Optional('percent_points', default=0) : Use(int),
     Optional('points', default=0) : Use(int),
-    Optional('stock_min', default=0) : Use(int),
+    Optional('stock', default=0) : Use(float),
+    Optional('stock_min', default=0) : Use(float),
     Optional('sale_min', default=0) : Use(float),
 
     #'modified' : Use(datetime),

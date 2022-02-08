@@ -18,9 +18,9 @@ def save():
         abort(401)
 
     app_config['API']['URL']            = request.form['api_url']
-    app_config['API']['ACCOUNT']        = request.form['api_account']
-    app_config['API']['USERNAME']       = request.form['api_username']
-    app_config['API']['PASSWORD']       = request.form['api_password']
+    app_config['API']['TOKEN']          = request.form['api_token']
+    # app_config['API']['USERNAME']       = request.form['api_username']
+    # app_config['API']['PASSWORD']       = request.form['api_password']
     # app_config['API']['BUSINESS']       = request.form['api_business']
     # app_config['API']['BRANCH']         = request.form['api_branch']
     app_config['API']['DELAY']          = request.form['api_delay']
@@ -49,7 +49,7 @@ def sync():
         
     sync = Sync()
     sync.del_products()
-    sync.get_products()
+    sync.get_all_products()
 
     flash('Synchronized products')
     return redirect(url_for('home'))
