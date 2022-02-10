@@ -165,7 +165,7 @@ class Products(Server):
                 logging.info('DISCOUNTS: {}'.format( len(discounts) ))
 
                 for discount in discounts:
-                    if(discount.get('product_id')):
+                    if(discount.get('product_id') and discounts.get('volume_discount_id')):
 
                         query = {
                             '_id' : ObjectId( discount['product_id'] )
@@ -173,7 +173,7 @@ class Products(Server):
 
                         data = {
                             '$set' : {
-                                'volume_discount' : ObjectId(discount['volume_discount'])
+                                'volume_discount' : ObjectId(discount['volume_discount_id'])
                             }
                         }
 

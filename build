@@ -1,0 +1,7 @@
+#!/bin/bash
+
+snapcraft &&
+snapcraft upload --release=edge supertpv-branch-server_* &&
+rm supertpv-branch-server_* &&
+RELEASE=$(snapcraft status supertpv-branch-server | sed -n 5p | awk '{ print $NF }') &&
+snapcraft release supertpv-branch-server $RELEASE stable

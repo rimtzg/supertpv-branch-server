@@ -84,6 +84,7 @@ app.register_blueprint(api)
 from syncs import sync_cashiers
 from syncs import sync_products
 from syncs import sync_volume_discounts
+from syncs import sync_recharges
 
 @app.before_first_request
 def first_start():
@@ -94,6 +95,9 @@ def first_start():
     thread.start()
 
     thread = threading.Thread(target=sync_volume_discounts)
+    thread.start()
+
+    thread = threading.Thread(target=sync_recharges)
     thread.start()
 
     pass
