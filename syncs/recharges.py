@@ -28,7 +28,9 @@ def sync_recharges():
         else:
             DELAY_TIME = DELAY
 
-        print(DELAY_TIME)
+        if(DELAY_TIME > 120):
+            DELAY_TIME = 120
+            
         sleep(DELAY_TIME)
 
 class DateTimeEncoder(JSONEncoder):

@@ -35,6 +35,9 @@ def sync_cashiers():
         else:
             DELAY_TIME = DELAY
 
+        if(DELAY_TIME > 120):
+            DELAY_TIME = 120
+
         sleep(DELAY_TIME)
     
 class Cashiers(Server):

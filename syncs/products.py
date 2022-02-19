@@ -46,6 +46,9 @@ def sync_products():
         else:
             DELAY_TIME = DELAY
 
+        if(DELAY_TIME > 120):
+            DELAY_TIME = 120
+
         sleep(DELAY_TIME)
     
 class Products(Server):
@@ -165,7 +168,7 @@ class Products(Server):
                 logging.info('DISCOUNTS: {}'.format( len(discounts) ))
 
                 for discount in discounts:
-                    if(discount.get('product_id') and discounts.get('volume_discount_id')):
+                    if(discount.get('product_id') and discount.get('volume_discount_id')):
 
                         query = {
                             '_id' : ObjectId( discount['product_id'] )

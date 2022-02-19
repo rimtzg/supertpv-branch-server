@@ -35,6 +35,9 @@ def sync_volume_discounts():
         else:
             DELAY_TIME = DELAY
 
+        if(DELAY_TIME > 120):
+            DELAY_TIME = 120
+
         sleep(DELAY_TIME)
     
 class VolumeDiscounts(Server):
