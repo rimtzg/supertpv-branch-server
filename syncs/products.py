@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from time import sleep
 
-from flask_script import Server
+# from flask_script import Server
 from bson.objectid import ObjectId
 
 from driver import mongo
@@ -51,7 +51,7 @@ def sync_products():
 
         sleep(DELAY_TIME)
     
-class Products(Server):
+class Products():
     def get(self, date=None):
         server = app_config['API']['URL']
         token = app_config['API']['TOKEN']

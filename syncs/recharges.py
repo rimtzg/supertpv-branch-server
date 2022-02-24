@@ -5,7 +5,7 @@ from datetime import datetime, date
 from time import sleep
 from json import JSONEncoder
 
-from flask_script import Server
+# from flask_script import Server
 from bson.objectid import ObjectId
 
 from driver import mongo
@@ -41,7 +41,7 @@ class DateTimeEncoder(JSONEncoder):
             if isinstance(obj, ObjectId):
                 return str(obj)
 
-class Recharges(Server):
+class Recharges():
     def upload(self):
         server = app_config['API']['URL']
         token = app_config['API']['TOKEN']

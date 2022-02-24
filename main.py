@@ -1,6 +1,6 @@
 from flask import Flask, render_template, g, session
 from flask_httpauth import HTTPBasicAuth
-from flask_script import Manager
+# from flask_script import Manager
 from flask_cors import CORS
 from datetime import date, datetime
 import logging
@@ -37,7 +37,7 @@ app = Flask(__name__)
 cors = CORS(app)
 auth = HTTPBasicAuth()
 app.config['SECRET_KEY'] = SECRET_KEY
-manager = Manager(app)
+# manager = Manager(app)
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -85,19 +85,23 @@ from syncs import sync_cashiers
 from syncs import sync_products
 from syncs import sync_volume_discounts
 from syncs import sync_recharges
+from syncs import sync_sessions
 
 @app.before_first_request
 def first_start():
-    thread = threading.Thread(target=sync_cashiers)
-    thread.start()
+    # thread = threading.Thread(target=sync_cashiers)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_products)
-    thread.start()
+    # thread = threading.Thread(target=sync_products)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_volume_discounts)
-    thread.start()
+    # thread = threading.Thread(target=sync_volume_discounts)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_recharges)
+    # thread = threading.Thread(target=sync_recharges)
+    # thread.start()
+
+    thread = threading.Thread(target=sync_sessions)
     thread.start()
 
     pass

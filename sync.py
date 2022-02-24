@@ -1,5 +1,5 @@
 from flask import session
-from flask_script import Server
+# from flask_script import Server
 import json
 from json import JSONEncoder
 import requests
@@ -32,7 +32,7 @@ class DateTimeEncoder(JSONEncoder):
             if isinstance(obj, ObjectId):
                 return str(obj)
 
-class Sync(Server):
+class Sync():
     def __init__(self):
         self.token = None
 
