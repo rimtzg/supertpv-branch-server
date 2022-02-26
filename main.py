@@ -89,17 +89,17 @@ from syncs import sync_sessions
 
 @app.before_first_request
 def first_start():
-    # thread = threading.Thread(target=sync_cashiers)
-    # thread.start()
+    thread = threading.Thread(target=sync_cashiers)
+    thread.start()
 
-    # thread = threading.Thread(target=sync_products)
-    # thread.start()
+    thread = threading.Thread(target=sync_products)
+    thread.start()
 
-    # thread = threading.Thread(target=sync_volume_discounts)
-    # thread.start()
+    thread = threading.Thread(target=sync_volume_discounts)
+    thread.start()
 
-    # thread = threading.Thread(target=sync_recharges)
-    # thread.start()
+    thread = threading.Thread(target=sync_recharges)
+    thread.start()
 
     thread = threading.Thread(target=sync_sessions)
     thread.start()

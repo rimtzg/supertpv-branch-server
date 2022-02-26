@@ -145,7 +145,8 @@ class Methods():
 
         total_card_payments = 0
         for card_payment in card_payments:
-            total_card_payments += card_payment['total']
+            if(card_payment.get('total')):
+                total_card_payments += card_payment['total']
 
         difference = total_deposits + total_returns + total_payments + total_card_payments - initial_money - total_sales - total_incomes
 
