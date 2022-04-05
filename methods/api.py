@@ -8,6 +8,7 @@ import re, math
 from schema import SchemaWrongKeyError
 
 from driver import mongo
+from config import app_config
 
 # from schemas.sessions import schema
 
@@ -113,7 +114,8 @@ class Methods():
         
         total_sales = 0
         for sale in sales:
-            total_sales += sale['total']
+            if not(sale.get('canceled') and sale['canceled']):
+                total_sales += sale['total']
         
         num_of_sales = sales.count()
 
@@ -145,10 +147,17 @@ class Methods():
 
         total_card_payments = 0
         for card_payment in card_payments:
-            if(card_payment.get('total')):
-                total_card_payments += card_payment['total']
+            if(card_payment.get('amount')):
+                total_card_payments += card_payment['amount']
 
-        difference = total_deposits + total_returns + total_payments + total_card_payments - initial_money - total_sales - total_incomes
+        cash_withdrawals = mongo['cash_withdrawals'].find({'session' : _id})
+
+        total_cash_withdrawals = 0
+        for cash_withdrawal in cash_withdrawals:
+            if(cash_withdrawal.get('amount')):
+                total_cash_withdrawals += cash_withdrawal['amount']
+
+        difference = total_deposits + total_returns + total_payments + total_card_payments + total_cash_withdrawals - initial_money - total_sales - total_incomes
 
         end_date = datetime.utcnow()
 
@@ -160,6 +169,7 @@ class Methods():
             'total_deposits' : total_deposits,
             'total_returns' : total_returns,
             'total_card_payments' : total_card_payments,
+            'total_cash_withdrawals' : total_cash_withdrawals,
             'difference' : difference,
             'end_date' : end_date,
             'closed' : True
@@ -453,6 +463,55 @@ class Methods():
 
         return document
 
+    def get_cash_withdrawals(self):
+        data = request.args
+
+        if(not data.get('session') ):
+            abort(403)
+
+        query = {
+            'session' : ObjectId(data['session'])
+        }
+
+        # print(query)
+
+        documents = mongo['cash_withdrawals'].find(query).sort([("date", 1)])
+
+        return list(documents)
+
+    def save_cash_withdrawal(self):
+        data = request.json
+        args = request.args
+
+        if(not args.get('session') ):
+            abort(403)
+
+        if(not args.get('cashier') ):
+            abort(401)
+
+        if(data.get('_id')):
+            _id = ObjectId(data['_id'])
+        else:
+            _id = ObjectId()
+
+        data['_id'] = _id
+
+        if(data.get('date')):
+            data['date'] = datetime.fromisoformat(data['date'])
+        else:
+            data['date'] = datetime.utcnow()
+
+        data['session'] = ObjectId(args['session'])
+        data['cashier'] = ObjectId(args['cashier'])
+
+        query = {
+            '_id' : _id
+        }
+
+        document = mongo['cash_withdrawals'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
+
+        return document
+
     def get_product(self):
         data = request.args
 
@@ -617,7 +676,18 @@ class Methods():
 
         return list(documents)
 
+    def get_config(self):
 
+
+        data = {
+            'can_delete' : app_config.getboolean('APP', 'can_delete'),
+            'phone' : app_config['APP']['phone'],
+            'round_product' : app_config.getboolean('APP', 'round_product'),
+            'round_sale' : app_config.getboolean('APP', 'round_sale'),
+            'show_init_money' : app_config.getboolean('APP', 'show_init_money'),
+        }
+        
+        return data
 
 
 

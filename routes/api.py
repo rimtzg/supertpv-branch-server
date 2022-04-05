@@ -69,6 +69,7 @@ def get_payments():
 def save_payment():
     return jsonify(Methods().save_payment())
 
+#CARD PAYMENTS
 @app.route('/card_payments', methods=['GET'])
 def get_card_payments():
     return jsonify(Methods().get_card_payments())
@@ -77,6 +78,16 @@ def get_card_payments():
 def save_card_payment():
     return jsonify(Methods().save_card_payment())
 
+#CASH WITHDRAWALS
+@app.route('/cash_withdrawals', methods=['GET'])
+def get_cash_withdrawals():
+    return jsonify(Methods().get_cash_withdrawals())
+
+@app.route('/cash_withdrawals', methods=['POST'])
+def save_cash_withdrawal():
+    return jsonify(Methods().save_cash_withdrawal())
+
+#
 @app.route('/sale', methods=['GET'])
 def get_sale():
     return jsonify(Methods().get_sale())
@@ -98,7 +109,9 @@ def get_products():
 def get_orders():
     return jsonify(Methods().get_orders())
 
-
+@app.route('/config', methods=['GET'])
+def get_config():
+    return jsonify(Methods().get_config())
 
 
 

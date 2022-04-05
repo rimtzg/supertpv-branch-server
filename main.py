@@ -86,9 +86,14 @@ from syncs import sync_products
 from syncs import sync_volume_discounts
 from syncs import sync_recharges
 from syncs import sync_sessions
+from syncs import sync_config
+from syncs import sync_sales
 
 @app.before_first_request
 def first_start():
+    thread = threading.Thread(target=sync_config)
+    thread.start()
+
     thread = threading.Thread(target=sync_cashiers)
     thread.start()
 
@@ -102,6 +107,9 @@ def first_start():
     thread.start()
 
     thread = threading.Thread(target=sync_sessions)
+    thread.start()
+
+    thread = threading.Thread(target=sync_sales)
     thread.start()
 
     pass
