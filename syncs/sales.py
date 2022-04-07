@@ -17,25 +17,15 @@ from config import app_config
 def sync_sales():
     logging.info('START SYNC SALES')
 
-    # DATE = datetime.utcnow().isoformat()
     DELAY = int(app_config['API']['DELAY'])
-    DELAY_TIME = 0
 
     sales = Sales()
 
     while True:
-        old = sales.upload_old()
-        new = sales.upload()
-
-        if not(old and new):
-            DELAY_TIME += DELAY
-        else:
-            DELAY_TIME = DELAY
-
-        if(DELAY_TIME > 120):
-            DELAY_TIME = 120
+        sales.upload_old()
+        sales.upload()
             
-        sleep(DELAY_TIME)
+        sleep(DELAY)
 
 class DateTimeEncoder(JSONEncoder):
         #Override the default method
@@ -47,8 +37,6 @@ class DateTimeEncoder(JSONEncoder):
 
 class Sales():
     def upload(self):
-        logging.info('SYNC NEW SALES')
-
         server = app_config['API']['URL']
         token = app_config['API']['TOKEN']
 
@@ -71,14 +59,8 @@ class Sales():
             sale = db.sales.find_one(query, sort=[("date", -1)])
 
             if(sale):
-                # cashier = db.cashiers.find_one({'_id' : session['cashier']})
+                logging.info('SYNC NEW SALE')
 
-                # if(cashier):
-                #     session['cashier_id'] = cashier['_id']
-                #     session['cashier_name'] = cashier['name']
-                # else:
-                #     session['cashier_id'] = session['cashier']
-                #     session['cashier_name'] = 'Sin nombre'
                 sale['session_id'] = sale['session']
 
                 url = '{}/sales/{}'.format( server, sale['_id'] )
@@ -108,8 +90,6 @@ class Sales():
         return False
 
     def upload_old(self):
-        logging.info('SYNC OLD SALES')
-
         server = app_config['API']['URL']
         token = app_config['API']['TOKEN']
 
@@ -132,6 +112,8 @@ class Sales():
             sale = db.Sales.find_one(query, sort=[("date", -1)])
 
             if(sale):
+                logging.info('SYNC OLD SALE')
+
                 products = []
 
                 for prod in sale['products']:
