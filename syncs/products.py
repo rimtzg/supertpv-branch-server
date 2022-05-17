@@ -25,6 +25,7 @@ def sync_products():
     products = Products()
 
     products.get()
+    products.deleted()
     products.prices()
     products.discounts()
     products.stock()
@@ -33,6 +34,7 @@ def sync_products():
 
     while True:
         num = products.get(DATE)
+        products.deleted()
 
         if(num > 0):
             products.prices()
@@ -78,16 +80,17 @@ class Products():
                 logging.exception(err)
 
             if(response and response.status_code == requests.codes.ok):
-                if not(date):
-                    db.products.delete_many({})
+                # if not(date):
+                #     db.products.delete_many({})
 
                 products = json.loads(response.text)
                 logging.info('PRODUCTS: {}'.format( len(products) ))
 
                 for product in products:
-                    
+                    _id = ObjectId( product['_id'] )
+
                     query = {
-                        '_id' : ObjectId( product['_id'] )
+                        '_id' : _id
                     }
 
                     data = {
@@ -99,6 +102,41 @@ class Products():
                 return len(products)
                 
         return 0
+
+    def deleted(self):
+        server = app_config['API']['URL']
+        token = app_config['API']['TOKEN']
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        if(db and token):
+            url = '{}/products/?deleted=True'.format( server )
+
+            headers = {
+                'Token' : token
+            }
+
+            response = None
+            try:
+                response = requests.get(url, headers=headers)
+            except requests.exceptions.RequestException as err:
+                logging.exception(err)
+
+            if(response and response.status_code == requests.codes.ok):
+                products = json.loads(response.text)
+                logging.info('DELETED PRODUCTS: {}'.format( len(products) ))
+
+                for product in products:
+                    _id = ObjectId( product['_id'] )
+
+                    query = {
+                        '_id' : _id
+                    }
+
+                    db.products.delete_one(query)
 
     def prices(self):
         server = app_config['API']['URL']

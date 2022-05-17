@@ -14,24 +14,14 @@ from config import app_config
 def sync_recharges():
     logging.info('START SYNC RECHARGES')
 
-    # DATE = datetime.utcnow().isoformat()
     DELAY = int(app_config['API']['DELAY'])
-    DELAY_TIME = 0
 
     recharges = Recharges()
 
     while True:
-        ok = recharges.upload()
+        recharges.upload()
 
-        if not(ok):
-            DELAY_TIME += DELAY
-        else:
-            DELAY_TIME = DELAY
-
-        if(DELAY_TIME > 120):
-            DELAY_TIME = 120
-            
-        sleep(DELAY_TIME)
+        sleep(DELAY)
 
 class DateTimeEncoder(JSONEncoder):
         #Override the default method
