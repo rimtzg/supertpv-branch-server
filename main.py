@@ -11,10 +11,6 @@ from bson import ObjectId
 
 from config import app_config, save_config_file
 
-from routes.config import app as config
-from routes.admin import app as admin
-from routes.api import app as api
-
 ########################################################################
 #                                                                      #
 #                               VARIABLES                              #
@@ -56,10 +52,19 @@ app.json_encoder = JSONEncoder
 #                              BLUEPRINTS                              #
 #                                                                      #
 ########################################################################
+from routes import index
+from routes import config
+from routes import admin
+from routes import api
+from routes import cashiers
+from routes import products
 
+app.register_blueprint(index)
 app.register_blueprint(config)
 app.register_blueprint(admin)
 app.register_blueprint(api)
+app.register_blueprint(cashiers)
+app.register_blueprint(products)
 
 ########################################################################
 #                                                                      #
@@ -88,6 +93,7 @@ from syncs import sync_recharges
 from syncs import sync_sessions
 from syncs import sync_config
 from syncs import sync_sales
+from syncs import sync_payments
 
 @app.before_first_request
 def first_start():
@@ -112,17 +118,10 @@ def first_start():
     thread = threading.Thread(target=sync_sales)
     thread.start()
 
+    thread = threading.Thread(target=sync_payments)
+    thread.start()
+
     pass
-
-########################################################################
-#                                                                      #
-#                                 HOME                                 #
-#                                                                      #
-########################################################################
-
-@app.route('/')
-def home():
-    return render_template('index.html')
 
 ########################################################################
 #                                                                      #

@@ -1,54 +1,28 @@
 {% extends "layout.html" %}
 {% block body %}
-<h2>Registered products:</h2>
 
-<form action="{{ url_for('config.sync') }}" method=POST class=sync>
-  <input type=submit value='Sync products' >
-</form>
+<h2>Cajeros</h2>
+Cajeros registrados: {{ cashiers }}
 <br/>
-<h2>Label printers:</h2>
-{% if ticket_printers %}
-<table>
-  <tr>
-    <th>Name</th>
-    <th>URI</th>
-    <th>Queue</th>
-    <th>Width</th>
-    <th>Height</th>
-    <th>Gap</th>
-    <th>Direct Thermal</th>
-  </tr>
-  {% for printer in label_printers %}
-  <tr>
-    <td>{{ printer.name }}</td>
-    <td>{{ printer.uri }}</td>
-    <td>{{ printer.queue }}</td>
-    <td>{{ printer.width }}</td>
-    <td>{{ printer.height }}</td>
-    <td>{{ printer.gap }}</td>
-    <td>{{ printer.direct_thermal }}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% else %}
-    <em>Unbelievable.  No label printers here so far</em>
-{% endif %}
 <br/>
-<h2>Templates:</h2>
-{% if templates %}
-<table>
-  <tr>
-    <th>Name</th>
-    <th>URL</th>
-  </tr>
-  {% for template in templates %}
-  <tr>
-    <td>{{ template.name }}</td>
-    <td>{{ template.url }}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% else %}
-    <em>Unbelievable.  No templates here so far</em>
-{% endif %}
+
+<h2>Productos</h2>
+Productos registrados: {{ products }}
+<br/>
+<br/>
+
+<h2>Descuentos por volumen</h2>
+Descuentos registrados: {{ discounts }}
+<br/>
+Productos con descuento: {{ products_discounts }}
+<br/>
+<br/>
+
+<h2>Ventas del dia</h2>
+Numero de ventas: {{ num_sales }}
+<br/>
+Total de ventas: {{ total_sales }}
+<br/>
+<br/>
+
 {% endblock %}

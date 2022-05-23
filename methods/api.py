@@ -689,8 +689,50 @@ class Methods():
         
         return data
 
+    def get_products_count(self):
+        total = mongo['products'].find({}).count()
 
+        return total
 
+    def get_discounts_count(self):
+        total = mongo['volume_discounts'].find({}).count()
 
+        return total
 
+    def get_products_with_discounts_count(self):
+        query = {
+            'volume_discount' : {'$ne' : None}
+        }
 
+        total = mongo['products'].find(query).count()
+
+        return total
+
+    def get_num_sales(self, start, end):
+        query = {}
+
+        query['start_date'] = {
+            '$gte' : start,
+            '$lt' : end
+        }
+
+        total = mongo['sales'].find(query).count()
+
+        return total
+
+    def get_total_sales(self, start, end):
+        query = {}
+
+        query['start_date'] = {
+            '$gte' : start,
+            '$lt' : end
+        }
+
+        sales = mongo['sales'].find(query)
+
+        total = 0
+        for sale in sales:
+            if(sale.get('closed') and not sale.get('canceled')):
+                total += sale['total']
+
+        return total

@@ -5,3 +5,4 @@ from syncs.recharges import sync_recharges
 from syncs.sessions import sync_sessions
 from syncs.config import sync_config
 from syncs.sales import sync_sales
+from syncs.payments import sync_payments

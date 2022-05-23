@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h2>Productos</h2>
+<br>
+<table>
+  <tr>
+    <th>Codigo</th>
+    <th>Nombre</th>
+    <th>Precio</th>
+  </tr>
+  {% for product in products %}
+  <tr>
+    <td>{{ product.code }}</td>
+    <td>{{ product.name }}</td>
+    <td>$ {{ product.price }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% if session.logged_in %}
+  <a href="{{ url_for('products.new') }}">Descargar lista</a>
+{% endif %}
+
+{% endblock %}
