@@ -6,3 +6,5 @@ from syncs.sessions import sync_sessions
 from syncs.config import sync_config
 from syncs.sales import sync_sales
 from syncs.payments import sync_payments
+from syncs.incomes import sync_incomes
+from syncs.deposits import sync_deposits
