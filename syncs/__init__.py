@@ -8,3 +8,4 @@ from syncs.sales import sync_sales
 from syncs.payments import sync_payments
 from syncs.incomes import sync_incomes
 from syncs.deposits import sync_deposits
+from syncs.returns import sync_returns

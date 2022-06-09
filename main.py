@@ -96,6 +96,7 @@ from syncs import sync_sales
 from syncs import sync_payments
 from syncs import sync_incomes
 from syncs import sync_deposits
+from syncs import sync_returns
 
 @app.before_first_request
 def first_start():
@@ -127,6 +128,9 @@ def first_start():
     thread.start()
 
     thread = threading.Thread(target=sync_deposits)
+    thread.start()
+
+    thread = threading.Thread(target=sync_returns)
     thread.start()
 
     pass
