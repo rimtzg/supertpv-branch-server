@@ -26,6 +26,9 @@ class Methods():
 
         cashier = mongo['cashiers'].find_one( query )
 
+        if not(cashier):
+            abort(404)
+
         return cashier
 
     def sessions(self):
@@ -65,9 +68,13 @@ class Methods():
         if(not data.get('cashier') ):
             abort(403)
 
+        cashier = mongo['cashiers'].find_one({ '_id' : ObjectId(data['cashier']) })
+
         query = {
             '_id' : ObjectId(),
-            'cashier' : ObjectId(data['cashier'])
+            'cashier' : cashier['_id'],
+            'cashier_id' : cashier['_id'],
+            'cashier_name' : cashier['name']
         }
 
         data = {
