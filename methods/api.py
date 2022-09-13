@@ -117,6 +117,11 @@ class Methods():
 
         initial_money = 0
 
+        session = mongo['sessions'].find_one(query)
+
+        if(session):
+            initial_money = session['init_money']
+
         sales = mongo['sales'].find({'session' : _id})
         
         total_sales = 0
@@ -169,6 +174,7 @@ class Methods():
         end_date = datetime.utcnow()
 
         data = {
+            'initial_money' : initial_money,
             'total_sales' : total_sales,
             'num_of_sales' : num_of_sales,
             'total_incomes' : total_incomes,
