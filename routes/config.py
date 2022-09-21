@@ -52,5 +52,5 @@ def sync():
     sync.get_all_products()
 
     flash('Synchronized products')
-    return redirect(url_for('home'))
+    return redirect(url_for('index.home'))
 

@@ -68,6 +68,11 @@ class Config():
                 else:
                     app_config['APP']['round_sale'] = 'False'
 
+                if(config.get('show_sessions')):
+                    app_config['APP']['show_sessions'] = str(config['show_sessions'])
+                else:
+                    app_config['APP']['show_sessions'] = 'False'
+
                 if(config.get('show_init_money')):
                     app_config['APP']['show_init_money'] = str(config['show_init_money'])
                 else:

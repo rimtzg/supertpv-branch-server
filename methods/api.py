@@ -120,7 +120,7 @@ class Methods():
         session = mongo['sessions'].find_one(query)
 
         if(session):
-            initial_money = session['init_money']
+            initial_money = session['init_money'] if session.get('init_money') else 0
 
         sales = mongo['sales'].find({'session' : _id})
         
@@ -697,6 +697,7 @@ class Methods():
             'phone' : app_config['APP']['phone'],
             'round_product' : app_config.getboolean('APP', 'round_product'),
             'round_sale' : app_config.getboolean('APP', 'round_sale'),
+            'show_sessions' : app_config.getboolean('APP', 'show_sessions'),
             'show_init_money' : app_config.getboolean('APP', 'show_init_money'),
         }
         
