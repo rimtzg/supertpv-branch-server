@@ -693,8 +693,9 @@ class Methods():
 
 
         data = {
+            'business_name' : app_config['APP']['business_name'] if app_config['APP'].get('business_name') else 'SuperTPV',
             'can_delete' : app_config.getboolean('APP', 'can_delete'),
-            'phone' : app_config['APP']['phone'],
+            'phone' : app_config['APP']['phone'] if app_config['APP'].get('phone') else '',
             'round_product' : app_config.getboolean('APP', 'round_product'),
             'round_sale' : app_config.getboolean('APP', 'round_sale'),
             'show_sessions' : app_config.getboolean('APP', 'show_sessions'),

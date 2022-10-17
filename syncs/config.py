@@ -50,6 +50,9 @@ class Config():
                 
                 logging.info('CONFIG: {}'.format( config ))
 
+                if(config.get('full_name')):
+                    app_config['APP']['business_name'] = config['full_name']
+
                 if(config.get('can_delete')):
                     app_config['APP']['can_delete'] = str(config['can_delete'])
                 else:

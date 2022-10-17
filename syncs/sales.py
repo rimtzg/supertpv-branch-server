@@ -168,9 +168,18 @@ class Sales():
                 else:
                     canceled = None
 
+                date = None
+                if(sale.get('date')):
+                    date = sale['date']
+
+                    try:
+                        date = local_time.localize(sale['date'], is_dst=None).astimezone(pytz.utc)
+                    except pytz.exceptions.NonExistentTimeError as err:
+                        logging.exception(err)
+
                 data = {
                     '_id' : sale['_id'],
-                    'date' : local_time.localize(sale['date'], is_dst=None).astimezone(pytz.utc),
+                    'date' : date,
                     'cashier_id' : sale['cashier_id'],
                     'cashier_name' : sale['cashier_name'],
                     'canceled' : canceled,
