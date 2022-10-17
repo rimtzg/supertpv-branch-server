@@ -66,48 +66,49 @@ class Incomes():
 
                 session = db.Sessions.find_one({ '_id' : income['session'] })
 
-                # print(session)
+                if(session):
+                    # print(session)
 
-                cashier = db.cashiers.find_one({ '_id' : session['user_id'] })
+                    cashier = db.cashiers.find_one({ '_id' : session['user_id'] })
 
-                # print(cashier)
-                if not(cashier):
-                    cashier = {
-                        '_id' : ObjectId(),
-                        'name' : 'Cajero sin nombre'
-                    }
-
-                data = {
-                    'cashier_id'   : cashier['_id'],
-                    'cashier_name' : cashier['name'],
-                    'session_id'   : session['_id'],
-                    'date'         : local_time.localize(income['date'], is_dst=None).astimezone(pytz.utc),
-                    'total'        : income['amount'],
-                    'razon'        : income['razon'],
-                }
-
-                url = '{}/incomes/{}'.format( server, income['_id'] )
-
-                data = DateTimeEncoder().encode(data)
-
-                response = None
-                try:
-                    response = requests.put(url, data=data, headers=headers)
-                except requests.exceptions.RequestException as err:
-                    logging.exception(err)
-
-                if(response and response.status_code == requests.codes.ok):
-
-                    query = {
-                        '_id' : income['_id']
-                    }
+                    # print(cashier)
+                    if not(cashier):
+                        cashier = {
+                            '_id' : ObjectId(),
+                            'name' : 'Cajero sin nombre'
+                        }
 
                     data = {
-                        '$set' : {'uploaded' : True}
+                        'cashier_id'   : cashier['_id'],
+                        'cashier_name' : cashier['name'],
+                        'session_id'   : session['_id'],
+                        'date'         : local_time.localize(income['date'], is_dst=None).astimezone(pytz.utc),
+                        'total'        : income['amount'],
+                        'razon'        : income['razon'],
                     }
 
-                    db.MoneyMovements.find_one_and_update(query, data)
+                    url = '{}/incomes/{}'.format( server, income['_id'] )
 
-                    return True
+                    data = DateTimeEncoder().encode(data)
+
+                    response = None
+                    try:
+                        response = requests.put(url, data=data, headers=headers)
+                    except requests.exceptions.RequestException as err:
+                        logging.exception(err)
+
+                    if(response and response.status_code == requests.codes.ok):
+
+                        query = {
+                            '_id' : income['_id']
+                        }
+
+                        data = {
+                            '$set' : {'uploaded' : True}
+                        }
+
+                        db.MoneyMovements.find_one_and_update(query, data)
+
+                        return True
 
         return False

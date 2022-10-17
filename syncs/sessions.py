@@ -23,8 +23,9 @@ def sync_sessions():
 
     while True:
         sessions.upload_old()
-        sessions.upload()
         sessions.upload_actual_old()
+        sessions.upload()
+        sessions.upload_actual()
             
         sleep(120)
 
@@ -221,6 +222,114 @@ class Sessions():
 
                     db.Sessions.find_one_and_update(query, data)
 
+                    return True
+
+        return False
+
+    def upload_actual(self):
+        server = app_config['API']['URL']
+        token = app_config['API']['TOKEN']
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        if(db and token):
+            query = {
+                'closed' : { '$ne' : True },
+            }
+
+            headers = {
+                'Token' : token,
+                'Content-Type' : 'application/json'
+            }
+
+            session = db.sessions.find_one(query, sort=[("start_date", -1)])
+
+            if(session):
+                logging.info('SYNC ACTUAL SESSION')
+
+                url = '{}/sessions/{}'.format( server, session['_id'] )
+
+                _id = session['_id']
+
+                initial_money = 0
+                if(session.get('initial_money')):
+                    initial_money = session['initial_money']
+
+                #local_datetime = local_time.localize(naive_datetime, is_dst=None)
+                start_date = local_time.localize(session['start_date'], is_dst=None).astimezone(pytz.utc)
+                if(session.get('end_date')):
+                    end_date = local_time.localize(session['end_date'], is_dst=None).astimezone(pytz.utc)
+                else:
+                    end_date = None
+
+                sales = db.sales.find({'session': session['_id'], 'canceled' : { '$ne' : True }})
+                total_sales = 0
+                for sale in sales:
+                    if(sale.get('total')):
+                        total_sales += sale['total']
+                    else:
+                        total_sales += 0
+
+                incomes = db.incomes.find({'session': session['_id']})
+                total_incomes = 0
+                for income in incomes:
+                    total_incomes += income['amount']
+
+                payments = db.payments.find({'session': session['_id']})
+                total_payments = 0
+                for payment in payments:
+                    total_payments += payment['amount']
+
+                deposits = db.deposits.find({'session': session['_id']})
+                total_deposits = 0
+                for deposit in deposits:
+                    total_deposits += deposit['total']
+
+                returns = db.returns.find({'session': session['_id']})
+                total_returns = 0
+                for ret in returns:
+                    total_returns += ret['total']
+
+                card_payments = db.card_payments.find({'session': session['_id']})
+                total_card_payments = 0
+                for payment in card_payments:
+                    total_card_payments += payment['amount']
+
+                difference = total_deposits + total_returns + total_payments + total_card_payments - initial_money - total_sales - total_incomes
+
+                # logging.info(difference)
+                
+                data = {
+                    '_id'                 : _id,
+                    'initial_money'       : initial_money,
+                    'total_sales'         : total_sales,
+                    'num_of_sales'        : sales.count(),
+                    'total_incomes'       : total_incomes,
+                    'total_payments'      : total_payments,
+                    'total_deposits'      : total_deposits,
+                    'total_returns'       : total_returns,
+                    'total_card_payments' : total_card_payments,
+                    'difference'          : difference,
+
+                    'start_date'          : start_date,
+                    'end_date'            : end_date,
+
+                    'cashier_id'          : session['cashier_id'],
+                    'cashier_name'        : session['cashier_name']
+                }
+
+                data = DateTimeEncoder().encode(data)
+
+                response = None
+                try:
+                    response = requests.put(url, data=data, headers=headers)
+                except requests.exceptions.RequestException as err:
+                    logging.exception(err)
+
+                if(response and response.status_code == requests.codes.ok):
                     return True
 
         return False
