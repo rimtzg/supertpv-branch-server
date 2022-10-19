@@ -700,6 +700,7 @@ class Methods():
             'round_sale' : app_config.getboolean('APP', 'round_sale'),
             'show_sessions' : app_config.getboolean('APP', 'show_sessions'),
             'show_init_money' : app_config.getboolean('APP', 'show_init_money'),
+            'has_services' : app_config.getboolean('APP', 'has_services'),
         }
         
         return data

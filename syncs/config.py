@@ -81,6 +81,11 @@ class Config():
                 else:
                     app_config['APP']['show_init_money'] = 'False'
 
+                if(config.get('has_services')):
+                    app_config['APP']['has_services'] = str(config['has_services'])
+                else:
+                    app_config['APP']['has_services'] = 'False'
+
                 save_config_file()
 
                 return True
