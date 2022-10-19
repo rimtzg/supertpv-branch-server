@@ -259,9 +259,9 @@ class Sessions():
                     initial_money = session['initial_money']
 
                 #local_datetime = local_time.localize(naive_datetime, is_dst=None)
-                start_date = local_time.localize(session['start_date'], is_dst=None).astimezone(pytz.utc)
+                start_date = session['start_date']
                 if(session.get('end_date')):
-                    end_date = local_time.localize(session['end_date'], is_dst=None).astimezone(pytz.utc)
+                    end_date = session['end_date']
                 else:
                     end_date = None
 

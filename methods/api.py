@@ -236,7 +236,7 @@ class Methods():
 
         _id = ObjectId()
 
-        data['sale'] = ObjectId(data['_id'])
+        data['sale'] = ObjectId(data['sale'])
         data['_id'] = _id
 
         data['date'] = datetime.utcnow()

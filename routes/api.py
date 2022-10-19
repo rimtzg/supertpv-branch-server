@@ -96,7 +96,6 @@ def get_sale():
 def save_sale():
     return jsonify(Methods().save_sale())
 
-
 @app.route('/product', methods=['GET'])
 def get_product():
     return jsonify(Methods().get_product())
