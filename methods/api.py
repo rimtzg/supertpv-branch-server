@@ -39,10 +39,10 @@ class Methods():
 
         query = {
             'cashier' : ObjectId(data['cashier']),
-            'closed' : { '$ne' : True }
+            'closed' : True
         }
 
-        sessions = mongo['sessions'].find( query )
+        sessions = mongo['sessions'].find( query ).limit(10).sort([("start_date", -1)])
 
         return list(sessions)
 
