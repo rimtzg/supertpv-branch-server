@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request, abort
 
 from methods.api import Methods
+from methods import Discounts
+
 PREFIX = 'api'
 
 app = Blueprint(PREFIX, __name__, url_prefix = '/'+PREFIX)
@@ -112,7 +114,9 @@ def get_orders():
 def get_config():
     return jsonify(Methods().get_config())
 
-
+@app.route('/discounts/get', methods=['POST'])
+def get_discounts():
+    return jsonify(Discounts().get())
 
 
 
