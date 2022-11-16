@@ -254,6 +254,13 @@ class Sessions():
 
                 _id = session['_id']
 
+                cashier = db.cashiers.find_one({'_id' : session['cashier']})
+
+                if not(cashier):
+                    cashier = {}
+                    cashier['_id'] = None
+                    cashier['name'] = 'Cajero'
+
                 initial_money = 0
                 if(session.get('initial_money')):
                     initial_money = session['initial_money']
@@ -317,8 +324,8 @@ class Sessions():
                     'start_date'          : start_date,
                     'end_date'            : end_date,
 
-                    'cashier_id'          : session['cashier_id'],
-                    'cashier_name'        : session['cashier_name']
+                    'cashier_id'          : cashier['_id'],
+                    'cashier_name'        : cashier['name']
                 }
 
                 data = DateTimeEncoder().encode(data)

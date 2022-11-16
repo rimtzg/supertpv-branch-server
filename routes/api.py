@@ -4,6 +4,7 @@ from methods.api import Methods
 from methods import Discounts
 from methods import Sales
 from methods import Sessions
+from methods import Config
 
 PREFIX = 'api'
 
@@ -114,7 +115,7 @@ def get_orders():
 
 @app.route('/config', methods=['GET'])
 def get_config():
-    return jsonify(Methods().get_config())
+    return jsonify(Config().get())
 
 @app.route('/discounts/get', methods=['POST'])
 def get_discounts():

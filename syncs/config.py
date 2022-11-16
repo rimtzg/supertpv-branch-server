@@ -86,6 +86,11 @@ class Config():
                 else:
                     app_config['APP']['has_services'] = 'False'
 
+                if(config.get('ticket_min')):
+                    app_config['APP']['ticket_min'] = str(config['ticket_min'])
+                else:
+                    app_config['APP']['ticket_min'] = '0'
+
                 save_config_file()
 
                 return True
