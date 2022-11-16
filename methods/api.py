@@ -31,21 +31,6 @@ class Methods():
 
         return cashier
 
-    def sessions(self):
-        data = request.args
-
-        if(not data.get('cashier') ):
-            abort(403)
-
-        query = {
-            'cashier' : ObjectId(data['cashier']),
-            'closed' : True
-        }
-
-        sessions = mongo['sessions'].find( query ).limit(10).sort([("start_date", -1)])
-
-        return list(sessions)
-
     def get_session(self):
         args = request.args
 
@@ -100,95 +85,6 @@ class Methods():
         }
 
         session = mongo['sessions'].find_one_and_update(query, {"$set": data}, return_document=ReturnDocument.AFTER)
-
-        return session
-
-    def close_session(self):
-        args = request.args
-
-        if(not args.get('session')):
-            abort(403)
-
-        _id = ObjectId(args['session'])
-
-        query = {
-            '_id' : _id
-        }
-
-        initial_money = 0
-
-        session = mongo['sessions'].find_one(query)
-
-        if(session):
-            initial_money = session['init_money'] if session.get('init_money') else 0
-
-        sales = mongo['sales'].find({'session' : _id})
-        
-        total_sales = 0
-        for sale in sales:
-            if not(sale.get('canceled') and sale['canceled']):
-                total_sales += sale['total']
-        
-        num_of_sales = sales.count()
-
-        incomes = mongo['incomes'].find({'session' : _id})
-        
-        total_incomes = 0
-        for income in incomes:
-            total_incomes += income['amount']
-
-        payments = mongo['payments'].find({'session' : _id})
-
-        total_payments = 0
-        for payment in payments:
-            total_payments += payment['amount']
-
-        deposits = mongo['deposits'].find({'session' : _id})
-
-        total_deposits = 0
-        for deposit in deposits:
-            total_deposits += deposit['total']
-
-        returns = mongo['returns'].find({'session' : _id})
-
-        total_returns = 0
-        for retur in returns:
-            total_returns += retur['total']
-
-        card_payments = mongo['card_payments'].find({'session' : _id})
-
-        total_card_payments = 0
-        for card_payment in card_payments:
-            if(card_payment.get('amount')):
-                total_card_payments += card_payment['amount']
-
-        cash_withdrawals = mongo['cash_withdrawals'].find({'session' : _id})
-
-        total_cash_withdrawals = 0
-        for cash_withdrawal in cash_withdrawals:
-            if(cash_withdrawal.get('amount')):
-                total_cash_withdrawals += cash_withdrawal['amount']
-
-        difference = total_deposits + total_returns + total_payments + total_card_payments + total_cash_withdrawals - initial_money - total_sales - total_incomes
-
-        end_date = datetime.utcnow()
-
-        data = {
-            'initial_money' : initial_money,
-            'total_sales' : total_sales,
-            'num_of_sales' : num_of_sales,
-            'total_incomes' : total_incomes,
-            'total_payments' : total_payments,
-            'total_deposits' : total_deposits,
-            'total_returns' : total_returns,
-            'total_card_payments' : total_card_payments,
-            'total_cash_withdrawals' : total_cash_withdrawals,
-            'difference' : difference,
-            'end_date' : end_date,
-            'closed' : True
-        }
-
-        session = mongo['sessions'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
 
         return session
 
@@ -596,69 +492,6 @@ class Methods():
 
         if not(document):
             abort(404)
-
-        return document
-
-    def save_sale(self):
-        _id = ObjectId()
-        args = request.args
-        data = request.json
-
-        if(not args.get('session') ):
-            abort(403)
-
-        if(not args.get('cashier') ):
-            abort(401)
-
-        query = {
-            '_id' : _id,
-            'session' : ObjectId(args['session'])
-        }
-
-        if(not data.get('canceled') or data['canceled'] == False):
-            ticket = mongo['sales'].find({"ticket" : { '$exists': True }}).count()+1
-
-            data['ticket'] = ticket
-
-        num_of_products = 0
-        for product in data['products']:
-            if(product.get('amount')):
-                amount = product['amount']
-            else:
-                amount = 1
-
-            if(product['scale']):
-                num_of_products += 1
-            else:
-                num_of_products += amount
-
-        data['num_of_products'] = num_of_products
-        data['date'] = datetime.utcnow()
-        # data['cashier_id'] = ObjectId(args['cashier'])
-
-        cashier = mongo['cashiers'].find_one({'_id' : ObjectId(args['cashier'])})
-
-        if not(cashier):
-            abort(401)
-
-        data['cashier_id'] = cashier['_id']
-        data['cashier_name'] = cashier['name']
-
-        document = mongo['sales'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
-
-        if(document.get('card')):
-            for card in document['card']:
-                data = {
-                    'sale' : document['_id'],
-                    'amount' : card['amount'],
-                    'operation' : card['operation'],
-                    'date' : document['date'],
-                    'commission' : card['commission'],
-                    'percent' : 5,
-                    'session' : document['session']
-                }
-
-                mongo['card_payments'].insert(data)
 
         return document
 

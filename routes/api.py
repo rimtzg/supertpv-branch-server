@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, request, abort
 
 from methods.api import Methods
 from methods import Discounts
+from methods import Sales
+from methods import Sessions
 
 PREFIX = 'api'
 
@@ -17,7 +19,7 @@ def login():
 
 @app.route('/sessions', methods=['GET'])
 def sessions():
-    return jsonify(Methods().sessions())
+    return jsonify(Sessions().list())
 
 @app.route('/session/', methods=['GET'])
 def get_session():
@@ -33,7 +35,7 @@ def save_session():
 
 @app.route('/session/close', methods=['GET'])
 def close_session():
-    return jsonify(Methods().close_session())
+    return jsonify(Sessions().close())
 
 @app.route('/sales', methods=['GET'])
 def get_sales():
@@ -96,7 +98,7 @@ def get_sale():
 
 @app.route('/sale', methods=['POST'])
 def save_sale():
-    return jsonify(Methods().save_sale())
+    return jsonify(Sales().save())
 
 @app.route('/product', methods=['GET'])
 def get_product():
