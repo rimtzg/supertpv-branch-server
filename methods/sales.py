@@ -63,8 +63,9 @@ class Methods():
                     'operation' : card['operation'],
                     'date' : document['date'],
                     'commission' : card['commission'],
-                    'percent' : 5,
-                    'session' : document['session']
+                    'percent' : card['percent'],
+                    'session' : document['session'],
+                    'total' : card['total']
                 }
 
                 mongo['card_payments'].insert(data)

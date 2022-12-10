@@ -86,10 +86,60 @@ class Config():
                 else:
                     app_config['APP']['has_services'] = 'False'
 
+                if(config.get('has_recharges')):
+                    app_config['APP']['has_recharges'] = str(config['has_recharges'])
+                else:
+                    app_config['APP']['has_recharges'] = 'False'
+
+                if(config.get('has_pins')):
+                    app_config['APP']['has_pins'] = str(config['has_pins'])
+                else:
+                    app_config['APP']['has_pins'] = 'False'
+
+                if(config.get('has_cash_withdrawals')):
+                    app_config['APP']['has_cash_withdrawals'] = str(config['has_cash_withdrawals'])
+                else:
+                    app_config['APP']['has_cash_withdrawals'] = 'False'
+
                 if(config.get('ticket_min')):
                     app_config['APP']['ticket_min'] = str(config['ticket_min'])
                 else:
                     app_config['APP']['ticket_min'] = '0'
+
+                if(config.get('card_commission')):
+                    app_config['APP']['card_commission'] = str(config['card_commission'])
+                else:
+                    app_config['APP']['card_commission'] = '0'
+
+                if(config.get('withdrawal_commission')):
+                    app_config['APP']['withdrawal_commission'] = str(config['withdrawal_commission'])
+                else:
+                    app_config['APP']['withdrawal_commission'] = '0'
+
+                if(config.get('apply_withdrawal_commission')):
+                    app_config['APP']['apply_withdrawal_commission'] = str(config['apply_withdrawal_commission'])
+                else:
+                    app_config['APP']['apply_withdrawal_commission'] = '0'
+
+                if(config.get('has_card_payment')):
+                    app_config['APP']['has_card_payment'] = str(config['has_card_payment'])
+                else:
+                    app_config['APP']['has_card_payment'] = 'False'
+
+                if(config.get('has_orders')):
+                    app_config['APP']['has_orders'] = str(config['has_orders'])
+                else:
+                    app_config['APP']['has_orders'] = 'False'
+
+                if(config.get('min_withdrawal_commission')):
+                    app_config['APP']['min_withdrawal_commission'] = str(config['min_withdrawal_commission'])
+                else:
+                    app_config['APP']['min_withdrawal_commission'] = '0'
+
+                if(config.get('max_withdrawal_commission')):
+                    app_config['APP']['max_withdrawal_commission'] = str(config['max_withdrawal_commission'])
+                else:
+                    app_config['APP']['max_withdrawal_commission'] = '0'
 
                 save_config_file()
 
