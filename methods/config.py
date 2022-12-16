@@ -30,6 +30,9 @@ class Methods():
             'has_orders' : app_config.getboolean('APP', 'has_orders'),
             'min_withdrawal_commission' : app_config.getint('APP', 'min_withdrawal_commission') if app_config['APP'].get('min_withdrawal_commission') else 0,
             'max_withdrawal_commission' : app_config.getint('APP', 'max_withdrawal_commission') if app_config['APP'].get('max_withdrawal_commission') else 0,
+            'recharges_commission' : app_config.getint('APP', 'recharges_commission') if app_config['APP'].get('recharges_commission') else 0,
+            'username_recharges' : app_config['APP']['username_recharges'] if app_config['APP'].get('username_recharges') else '',
+            'password_recharges' : app_config['APP']['password_recharges'] if app_config['APP'].get('password_recharges') else '',
         }
         
         return data

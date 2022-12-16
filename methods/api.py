@@ -31,22 +31,6 @@ class Methods():
 
         return cashier
 
-    def get_sales(self):
-        data = request.args
-
-        if(not data.get('session') ):
-            abort(403)
-
-        query = {
-            'session' : ObjectId(data['session'])
-        }
-
-        # print(query)
-
-        documents = mongo['sales'].find(query).sort([("date", 1)])
-
-        return list(documents)
-
     def get_returns(self):
         data = request.args
 
@@ -419,24 +403,6 @@ class Methods():
         documents = mongo['products'].find(query).sort([("name", 1)])
 
         return list(documents)
-
-    def get_sale(self):
-        args = request.args
-
-        if(not args.get('ticket') ):
-            abort(400)
-
-        query = {
-            'ticket'    : int(args['ticket']),
-            'returned'  : { '$ne' : True}
-        }
-
-        document = mongo['sales'].find_one(query)
-
-        if not(document):
-            abort(404)
-
-        return document
 
     def get_orders(self):
         args = request.args

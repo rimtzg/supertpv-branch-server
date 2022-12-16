@@ -8,6 +8,40 @@ from pymongo import ReturnDocument
 from driver import mongo
 
 class Methods():
+    def get(self):
+        args = request.args
+
+        if(not args.get('ticket') ):
+            abort(400)
+
+        query = {
+            'ticket'    : int(args['ticket']),
+            'returned'  : { '$ne' : True}
+        }
+
+        document = mongo['sales'].find_one(query)
+
+        if not(document):
+            abort(404)
+
+        return document
+
+    def list(self):
+        data = request.args
+
+        if(not data.get('session') ):
+            abort(403)
+
+        query = {
+            'session' : ObjectId(data['session'])
+        }
+
+        # print(query)
+
+        documents = mongo['sales'].find(query).sort([("date", 1)])
+
+        return list(documents)
+
     def save(self):
         _id = ObjectId()
         args = request.args

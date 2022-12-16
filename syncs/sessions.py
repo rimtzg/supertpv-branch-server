@@ -63,7 +63,7 @@ class Sessions():
             if(session):
                 logging.info('SYNC NEW SESSION')
 
-                cashier = db.cashiers.find_one({'_id' : session['cashier']})
+                cashier = db.cashiers.find_one({'_id' : session['cashier_id']})
 
                 if(cashier):
                     session['cashier_id'] = cashier['_id']

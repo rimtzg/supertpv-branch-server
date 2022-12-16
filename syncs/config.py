@@ -91,6 +91,20 @@ class Config():
                 else:
                     app_config['APP']['has_recharges'] = 'False'
 
+                if(config.get('recharges_commission')):
+                    app_config['APP']['recharges_commission'] = str(config['recharges_commission'])
+                else:
+                    app_config['APP']['recharges_commission'] = '0'
+
+                if(config.get('url_recharges')):
+                    app_config['APP']['url_recharges'] = config['url_recharges']
+
+                if(config.get('username_recharges')):
+                    app_config['APP']['username_recharges'] = config['username_recharges']
+
+                if(config.get('password_recharges')):
+                    app_config['APP']['password_recharges'] = config['password_recharges']
+
                 if(config.get('has_pins')):
                     app_config['APP']['has_pins'] = str(config['has_pins'])
                 else:

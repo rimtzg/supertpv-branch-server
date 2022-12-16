@@ -6,11 +6,15 @@ from methods import Sales
 from methods import Config
 
 from routes.sessions import app as sessions
+from routes.sales import app as sales
+from routes.recharges import app as recharges
 
 PREFIX = 'api'
 
 app = Blueprint(PREFIX, __name__, url_prefix = '/'+PREFIX)
 app.register_blueprint(sessions)
+app.register_blueprint(sales)
+app.register_blueprint(recharges)
 
 @app.route('/', methods=['GET'])
 def api():
@@ -19,10 +23,6 @@ def api():
 @app.route('/login', methods=['GET'])
 def login():
     return jsonify(Methods().login())
-
-@app.route('/sales', methods=['GET'])
-def get_sales():
-    return jsonify(Methods().get_sales())
 
 @app.route('/returns', methods=['GET'])
 def get_returns():
@@ -73,15 +73,6 @@ def get_cash_withdrawals():
 @app.route('/cash_withdrawals', methods=['POST'])
 def save_cash_withdrawal():
     return jsonify(Methods().save_cash_withdrawal())
-
-#
-@app.route('/sale', methods=['GET'])
-def get_sale():
-    return jsonify(Methods().get_sale())
-
-@app.route('/sale', methods=['POST'])
-def save_sale():
-    return jsonify(Sales().save())
 
 @app.route('/product', methods=['GET'])
 def get_product():
