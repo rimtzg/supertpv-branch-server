@@ -68,7 +68,7 @@ class Recharges():
         URL = app_config['APP']['url_recharges']
         response = None
         request = None
-        data = None
+        data = {}
         new_xml = None
 
         logging.debug('Usuario: ' + USERNAME)
@@ -81,7 +81,6 @@ class Recharges():
 
         logging.debug('Request: ' + str(request))
 
-        data = {}
         data['date'] = datetime.utcnow()
         data['info'] = None
         data['status'] = False
@@ -118,14 +117,14 @@ class Recharges():
 
                     if(new_xml):
                         logging.debug(new_xml)
-                        result = ET.XML(new_xml)
-                        operation = result.find('operation').text
+                        xml_text = ET.XML(new_xml)
+                        operation = xml_text.find('operation').text
 
                         if(operation != 'Error'):
-                            data['info'] = "Recarga realizada, Folio: {}".format(result.find('auth1').text)
+                            data['info'] = "Recarga realizada, Folio: {}".format(xml_text.find('auth1').text)
                             data['status'] = True
                         else:
-                            data['info'] = result.find('result').text
+                            data['info'] = xml_text.find('result').text
                     else:
                         data['info'] = 'Error al leer los datos del servidor'
                 else:
@@ -168,3 +167,61 @@ class Recharges():
         # mongo['sales'].find_one_and_update(query_sale, {'$set': { 'returned' : True }})
 
         return document
+
+    def balance(self):
+        USERNAME = app_config['APP']['username_recharges']
+        PASSWORD = app_config['APP']['password_recharges']
+        URL = app_config['APP']['url_recharges']
+        response = None
+        request = None
+        data = {}
+        new_xml = None
+
+        logging.debug('Usuario: ' + USERNAME)
+        logging.debug('Password: ' + PASSWORD)
+
+        try:
+            request = urllib.request.Request(URL)
+        except urllib.error.URLError as e:
+            self.log.error(e)
+
+        logging.debug('Request: ' + str(request))
+
+        if(request):
+            xml = '''<?xml version='1.0' encoding='utf-8'?>
+            <operation>Balance</operation>
+            <user>USERNAME</user>
+            <password>PASSWORD</password>
+            '''.replace('USERNAME', USERNAME).replace('PASSWORD', computeMD5hash(PASSWORD))
+
+            logging.debug('XML: ' + xml)
+
+            request.add_header('Content-Type', 'application/xml')
+            response = urllib.request.urlopen(request, data=xml.encode('utf-8'))
+
+            if(response):
+                logging.debug('Status: ' + str(response.status))
+                logging.debug('Message: ' + response.msg)
+
+                result = response.read()
+
+                if(result):
+                    logging.debug('Result: ' + str(result))
+
+                    root = ET.fromstring(result)
+
+                    for child in root.iter('resultado'):
+                        #new_xml = child.text
+                        new_xml = '<?xml version="1.0" encoding="utf-8"?><data>' + child.text + '</data>'
+
+                    if(new_xml):
+                        logging.debug(new_xml)
+                        xml_text = ET.XML(new_xml)
+                        operation = xml_text.find('operation').text
+
+                        if(operation != 'Error'):
+                            data['balance'] = xml_text.find('qty').text
+
+        logging.debug('Data: ' + str(data))
+
+        return data

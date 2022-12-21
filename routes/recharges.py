@@ -7,13 +7,17 @@ PREFIX = 'recharge'
 app = Blueprint(PREFIX, __name__, url_prefix = '/'+PREFIX)
 
 @app.route('/', methods=['GET'])
-def get_session():
+def get():
     return jsonify(Recharges().get())
 
 @app.route('/', methods=['POST'])
-def save_session():
+def save():
     return jsonify(Recharges().save())
 
 @app.route('/list', methods=['GET'])
-def sessions():
+def list():
     return jsonify(Recharges().list())
+
+@app.route('/balance', methods=['GET'])
+def balance():
+    return jsonify(Recharges().balance())
