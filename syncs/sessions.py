@@ -69,7 +69,7 @@ class Sessions():
                     session['cashier_id'] = cashier['_id']
                     session['cashier_name'] = cashier['name']
                 else:
-                    session['cashier_id'] = session['cashier']
+                    session['cashier_id'] = session['cashier_id']
                     session['cashier_name'] = 'Sin nombre'
 
                 url = '{}/sessions/{}'.format( server, session['_id'] )
@@ -254,7 +254,7 @@ class Sessions():
 
                 _id = session['_id']
 
-                cashier = db.cashiers.find_one({'_id' : session['cashier']})
+                cashier = db.cashiers.find_one({'_id' : session['cashier_id']})
 
                 if not(cashier):
                     cashier = {}
