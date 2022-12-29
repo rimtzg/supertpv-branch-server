@@ -19,6 +19,22 @@ def computeMD5hash(my_string):
     return m.hexdigest()
 
 class Recharges():
+    def list(self):
+        data = request.args
+
+        if(not data.get('session') ):
+            abort(403)
+
+        query = {
+            'session' : ObjectId(data['session'])
+        }
+
+        # print(query)
+
+        documents = mongo['recharges'].find(query).sort([("date", 1)])
+
+        return list(documents)
+
     def save(self):
         _id = ObjectId()
         args = request.args
