@@ -86,6 +86,7 @@ class Methods():
 
         data['cashier_id'] = cashier['_id']
         data['cashier_name'] = cashier['name']
+        data['closed'] = True
 
         document = mongo['sales'].find_one_and_update(query, {"$set": data}, upsert=True, return_document=ReturnDocument.AFTER)
 

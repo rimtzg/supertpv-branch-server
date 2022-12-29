@@ -387,18 +387,29 @@ class Methods():
     def get_products(self):
         data = request.args
 
-        if(not data.get('name') ):
+        if(not data.get('search') ):
             abort(404)
-
-        search = data['name'].lower()
         
         query = {
-            '$or' : [
-                { 'name': {'$regex': search} },
-                { 'code': {'$regex': search} },
-            ],
             'active' : True
         }
+
+        search = data['search'].lower()
+
+        if(search):
+            words = search.split()
+            regex = ''
+
+            for x, w in enumerate(words):
+                if(x>0):
+                    regex += '.*'
+
+                regex += '{}'.format(w)
+
+            query['$or'] = [
+                { 'name' : { '$regex' : regex } },
+                { 'code' : { '$regex' : regex } },
+            ]
 
         documents = mongo['products'].find(query).sort([("name", 1)])
 
