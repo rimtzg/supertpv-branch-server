@@ -29,18 +29,31 @@ class Methods():
     def list(self):
         data = request.args
 
-        if(not data.get('session') ):
+        if not( data.get('session') ):
             abort(403)
 
         query = {
             'session' : ObjectId(data['session'])
         }
 
+        sort = [("date", 1)]
+        if( data.get('sort') ):
+            field = data['sort']
+            direction = 1
+
+            if( data.get('dir') and data['dir'] == 'desc' ):
+                direction = -1
+
+            sort = [(field, direction)]
+
         # print(query)
 
-        documents = mongo['sales'].find(query).sort([("date", 1)])
+        documents = list(mongo['sales'].find(query).sort(sort))
 
-        return list(documents)
+        for document in documents:
+            document['products'] = self.fit_products(document['products'])
+
+        return documents
 
     def save(self):
         _id = ObjectId()
@@ -105,4 +118,24 @@ class Methods():
 
                 mongo['card_payments'].insert(data)
 
+        document['products'] = self.fit_products(document['products'])
+
         return document
+
+    def fit_products(self, products):
+
+        list_products = []
+        for product in products:
+
+            is_in = False
+            for prod in list_products:
+                if(product['code'] == prod['code']):
+                    is_in = True
+
+            if(is_in):
+                prod['amount'] += product['amount']
+                prod['subtotal'] += product['subtotal']
+            else:
+                list_products.append(product)
+
+        return list_products
