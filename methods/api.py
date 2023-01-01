@@ -125,6 +125,14 @@ class Methods():
         data['session'] = ObjectId(args['session'])
         data['cashier'] = ObjectId(args['cashier'])
 
+        cashier = mongo['cashiers'].find_one({'_id' : ObjectId(args['cashier'])})
+
+        if not(cashier):
+            abort(401)
+
+        data['cashier_id'] = cashier['_id']
+        data['cashier_name'] = cashier['name']
+
         if not(data.get('number')):
             number = mongo['deposits'].find({"number" : { '$exists': True }}).count()+1
         else:
