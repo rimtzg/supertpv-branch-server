@@ -28,6 +28,8 @@ class Methods():
             'apply_withdrawal_commission' : app_config.getint('APP', 'apply_withdrawal_commission') if app_config['APP'].get('apply_withdrawal_commission') else 0,
             'has_card_payment' : app_config.getboolean('APP', 'has_card_payment'),
             'has_orders' : app_config.getboolean('APP', 'has_orders'),
+            'has_labels' : app_config.getboolean('APP', 'has_labels'),
+
             'min_withdrawal_commission' : app_config.getint('APP', 'min_withdrawal_commission') if app_config['APP'].get('min_withdrawal_commission') else 0,
             'max_withdrawal_commission' : app_config.getint('APP', 'max_withdrawal_commission') if app_config['APP'].get('max_withdrawal_commission') else 0,
             'recharges_commission' : app_config.getint('APP', 'recharges_commission') if app_config['APP'].get('recharges_commission') else 0,

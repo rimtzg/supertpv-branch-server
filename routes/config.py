@@ -40,7 +40,7 @@ def save():
     save_config_file()
 
     flash('Configuration was successfully saved')
-    return redirect(url_for('home'))
+    return redirect(url_for('index.home'))
 
 @app.route('/sync', methods=['POST'])
 def sync():

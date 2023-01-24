@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from flask import Flask, render_template, g, session
 from flask_httpauth import HTTPBasicAuth
 # from flask_script import Manager
@@ -21,6 +23,7 @@ try:
     DEBUG = app_config['APP']['DEBUG']
 except:
     DEBUG = True
+    
 SECRET_KEY = app_config['SERVER']['SECRET_KEY']
 
 ########################################################################

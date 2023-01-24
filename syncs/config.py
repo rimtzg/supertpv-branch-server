@@ -145,6 +145,11 @@ class Config():
                 else:
                     app_config['APP']['has_orders'] = 'False'
 
+                if(config.get('has_labels')):
+                    app_config['APP']['has_labels'] = str(config['has_labels'])
+                else:
+                    app_config['APP']['has_labels'] = 'False'
+
                 if(config.get('min_withdrawal_commission')):
                     app_config['APP']['min_withdrawal_commission'] = str(config['min_withdrawal_commission'])
                 else:

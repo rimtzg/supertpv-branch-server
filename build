@@ -1,5 +1,6 @@
 #!/bin/bash
 
 snapcraft --debug &&
-snapcraft upload --release=edge supertpv-branch-server_*
+snapcraft upload --release=edge supertpv-branch-server_* &&
+snapcraft status supertpv-branch-server
 rm supertpv-branch-server_*
