@@ -160,6 +160,15 @@ class Config():
                 else:
                     app_config['APP']['max_withdrawal_commission'] = '0'
 
+                #TICKETS
+                if(config.get('num_tickets')):
+                    app_config['APP']['num_tickets'] = str(config['num_tickets'])
+                else:
+                    app_config['APP']['num_tickets'] = '0'
+
+                if(config.get('footer')):
+                    app_config['APP']['footer'] = config['footer']
+
                 save_config_file()
 
                 return True
