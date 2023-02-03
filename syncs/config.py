@@ -160,6 +160,12 @@ class Config():
                 else:
                     app_config['APP']['max_withdrawal_commission'] = '0'
 
+                #APP
+                if(config.get('show_shortcuts')):
+                    app_config['APP']['show_shortcuts'] = str(config['show_shortcuts'])
+                else:
+                    app_config['APP']['show_shortcuts'] = 'False'
+
                 #TICKETS
                 if(config.get('num_tickets')):
                     app_config['APP']['num_tickets'] = str(config['num_tickets'])

@@ -33,6 +33,9 @@ class Methods():
             'min_withdrawal_commission' : app_config.getint('APP', 'min_withdrawal_commission') if app_config['APP'].get('min_withdrawal_commission') else 0,
             'max_withdrawal_commission' : app_config.getint('APP', 'max_withdrawal_commission') if app_config['APP'].get('max_withdrawal_commission') else 0,
 
+            #APP
+            'show_shortcuts' : app_config.getboolean('APP', 'show_shortcuts'),
+
             #RECHARGES
             'has_recharges' : app_config.getboolean('APP', 'has_recharges'),
             'recharges_commission' : app_config.getint('APP', 'recharges_commission') if app_config['APP'].get('recharges_commission') else 0,
