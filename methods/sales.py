@@ -133,8 +133,11 @@ class Methods():
                     is_in = True
 
             if(is_in):
-                prod['amount'] += product['amount']
-                prod['subtotal'] += product['subtotal']
+                if(product.get('amount')):
+                    prod['amount'] += float(product['amount'])
+
+                if(product.get('subtotal')):
+                    prod['subtotal'] += float(product['subtotal'])
             else:
                 list_products.append(product)
 
