@@ -28,7 +28,7 @@ class Methods():
                     dis['total'] = 0
                     if(dis['count'] >= dis['amount']):
                         if(dis['from']):
-                            rest = dis['count'] * dis['discount']
+                            rest = (dis['count'] / dis['amount']) * dis['discount']
                         else:
                             rest = (dis['count'] // dis['amount']) * dis['discount']
 

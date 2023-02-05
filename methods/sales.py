@@ -140,7 +140,11 @@ class Methods():
                     if(prod['amount'] == '.'):
                         prod['amount'] = 0
 
-                    prod['amount'] = float(prod['amount']) + float(product['amount'])
+
+                    try:
+                        prod['amount'] = float(prod['amount']) + float(product['amount'])
+                    except:
+                        prod['amount'] = 0
 
                 if(product.get('subtotal')):
                     if not(prod.get('subtotal')):
