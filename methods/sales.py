@@ -134,10 +134,19 @@ class Methods():
 
             if(is_in):
                 if(product.get('amount')):
-                    prod['amount'] += float(product['amount'])
+                    if(product['amount'] == '.'):
+                        product['amount'] = 0
+
+                    if(prod['amount'] == '.'):
+                        prod['amount'] = 0
+
+                    prod['amount'] = float(prod['amount']) + float(product['amount'])
 
                 if(product.get('subtotal')):
-                    prod['subtotal'] += float(product['subtotal'])
+                    if not(prod.get('subtotal')):
+                        prod['subtotal'] = 0
+
+                    prod['subtotal'] = float(prod['subtotal']) + float(product['subtotal'])
             else:
                 list_products.append(product)
 
