@@ -111,7 +111,6 @@ class Methods():
 
         query = {
             'cashier_id' : ObjectId(data['cashier']),
-            'closed' : True
         }
 
         sessions = list(mongo['sessions'].find( query ).limit(10).sort([("start_date", -1)]))
