@@ -23,6 +23,7 @@ def sync_incomes():
 
     while True:
         incomes.upload_old()
+        incomes.upload()
         # sales.upload()
             
         sleep(DELAY)
@@ -36,6 +37,57 @@ class DateTimeEncoder(JSONEncoder):
                 return str(obj)
 
 class Incomes():
+    def upload(self):
+        server = app_config['API']['URL']
+        token = app_config['API']['TOKEN']
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        if(db and token):
+            query = {
+                'uploaded' : { '$ne' : True }
+            }
+
+            headers = {
+                'Token' : token,
+                'Content-Type' : 'application/json'
+            }
+
+            income = db.incomes.find_one(query, sort=[("date", -1)])
+
+            if(income):
+                logging.info('SYNC NEW SALE')
+
+                income['session_id'] = income['session']
+
+                url = '{}/incomes/{}'.format( server, income['_id'] )
+
+                data = DateTimeEncoder().encode(income)
+
+                response = None
+                try:
+                    response = requests.put(url, data=data, headers=headers)
+                except requests.exceptions.RequestException as err:
+                    logging.exception(err)
+
+                if(response and response.status_code == requests.codes.ok):
+
+                    query = {
+                        '_id' : income['_id']
+                    }
+
+                    data = {
+                        '$set' : {'uploaded' : True}
+                    }
+
+                    db.incomes.find_one_and_update(query, data)
+
+                    return True
+
+        return False
 
     def upload_old(self):
         server = app_config['API']['URL']
@@ -59,7 +111,7 @@ class Incomes():
 
             income = db.MoneyMovements.find_one(query, sort=[("date", -1)])
 
-            # print(payment)
+            # print(income)
 
             if(income):
                 logging.info('SYNC OLD INCOME')

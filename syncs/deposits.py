@@ -23,7 +23,7 @@ def sync_deposits():
 
     while True:
         deposits.upload_old()
-        # sales.upload()
+        deposits.upload()
             
         sleep(DELAY)
 
@@ -36,6 +36,57 @@ class DateTimeEncoder(JSONEncoder):
                 return str(obj)
 
 class Deposits():
+    def upload(self):
+        server = app_config['API']['URL']
+        token = app_config['API']['TOKEN']
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        if(db and token):
+            query = {
+                'uploaded' : { '$ne' : True }
+            }
+
+            headers = {
+                'Token' : token,
+                'Content-Type' : 'application/json'
+            }
+
+            deposit = db.deposits.find_one(query, sort=[("date", -1)])
+
+            if(deposit):
+                logging.info('SYNC NEW SALE')
+
+                deposit['session_id'] = deposit['session']
+
+                url = '{}/deposits/{}'.format( server, deposit['_id'] )
+
+                data = DateTimeEncoder().encode(deposit)
+
+                response = None
+                try:
+                    response = requests.put(url, data=data, headers=headers)
+                except requests.exceptions.RequestException as err:
+                    logging.exception(err)
+
+                if(response and response.status_code == requests.codes.ok):
+
+                    query = {
+                        '_id' : deposit['_id']
+                    }
+
+                    data = {
+                        '$set' : {'uploaded' : True}
+                    }
+
+                    db.deposits.find_one_and_update(query, data)
+
+                    return True
+
+        return False
 
     def upload_old(self):
         server = app_config['API']['URL']

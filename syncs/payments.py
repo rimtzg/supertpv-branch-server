@@ -23,7 +23,7 @@ def sync_payments():
 
     while True:
         payments.upload_old()
-        # sales.upload()
+        payments.upload()
             
         sleep(DELAY)
 
@@ -47,8 +47,7 @@ class Payments():
 
         if(db and token):
             query = {
-                'uploaded' : { '$ne' : True },
-                'closed' : True,
+                'uploaded' : { '$ne' : True }
             }
 
             headers = {
@@ -56,16 +55,16 @@ class Payments():
                 'Content-Type' : 'application/json'
             }
 
-            sale = db.sales.find_one(query, sort=[("date", -1)])
+            payment = db.payments.find_one(query, sort=[("date", -1)])
 
-            if(sale):
+            if(payment):
                 logging.info('SYNC NEW SALE')
 
-                sale['session_id'] = sale['session']
+                payment['session_id'] = payment['session']
 
-                url = '{}/sales/{}'.format( server, sale['_id'] )
+                url = '{}/payments/{}'.format( server, payment['_id'] )
 
-                data = DateTimeEncoder().encode(sale)
+                data = DateTimeEncoder().encode(payment)
 
                 response = None
                 try:
@@ -76,14 +75,14 @@ class Payments():
                 if(response and response.status_code == requests.codes.ok):
 
                     query = {
-                        '_id' : sale['_id']
+                        '_id' : payment['_id']
                     }
 
                     data = {
                         '$set' : {'uploaded' : True}
                     }
 
-                    db.sales.find_one_and_update(query, data)
+                    db.payments.find_one_and_update(query, data)
 
                     return True
 
