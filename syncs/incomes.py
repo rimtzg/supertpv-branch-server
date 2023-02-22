@@ -135,8 +135,8 @@ class Incomes():
                         'cashier_name' : cashier['name'],
                         'session_id'   : session['_id'],
                         'date'         : local_time.localize(income['date'], is_dst=None).astimezone(pytz.utc),
-                        'total'        : income['amount'],
-                        'razon'        : income['razon'],
+                        'amount'       : income['amount'],
+                        'reason'       : income['razon'],
                     }
 
                     url = '{}/incomes/{}'.format( server, income['_id'] )

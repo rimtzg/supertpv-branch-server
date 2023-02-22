@@ -133,8 +133,8 @@ class Payments():
                     'cashier_name' : cashier['name'],
                     'session_id'   : session['_id'],
                     'date'         : local_time.localize(payment['date'], is_dst=None).astimezone(pytz.utc),
-                    'total'        : payment['amount'],
-                    'razon'        : payment['razon'],
+                    'amount'       : payment['amount'],
+                    'reason'       : payment['razon'],
                 }
 
                 url = '{}/payments/{}'.format( server, payment['_id'] )
