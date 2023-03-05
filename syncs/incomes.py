@@ -133,6 +133,7 @@ class Incomes():
                     data = {
                         'cashier_id'   : cashier['_id'],
                         'cashier_name' : cashier['name'],
+                        'cashier'      : cashier['_id'],
                         'session_id'   : session['_id'],
                         'date'         : local_time.localize(income['date'], is_dst=None).astimezone(pytz.utc),
                         'amount'       : income['amount'],

@@ -130,6 +130,7 @@ class Payments():
 
                 data = {
                     'cashier_id'   : cashier['_id'],
+                    'cashier'      : cashier['_id'],
                     'cashier_name' : cashier['name'],
                     'session_id'   : session['_id'],
                     'date'         : local_time.localize(payment['date'], is_dst=None).astimezone(pytz.utc),
