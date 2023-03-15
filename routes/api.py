@@ -8,6 +8,7 @@ from methods import Config
 from routes.sessions import app as sessions
 from routes.sales import app as sales
 from routes.recharges import app as recharges
+from routes.returns import app as returns
 
 PREFIX = 'api'
 
@@ -15,6 +16,7 @@ app = Blueprint(PREFIX, __name__, url_prefix = '/'+PREFIX)
 app.register_blueprint(sessions)
 app.register_blueprint(sales)
 app.register_blueprint(recharges)
+app.register_blueprint(returns)
 
 @app.route('/', methods=['GET'])
 def api():
@@ -23,14 +25,6 @@ def api():
 @app.route('/login', methods=['GET'])
 def login():
     return jsonify(Methods().login())
-
-@app.route('/returns', methods=['GET'])
-def get_returns():
-    return jsonify(Methods().get_returns())
-
-@app.route('/returns', methods=['POST'])
-def save_return():
-    return jsonify(Methods().save_return())
 
 @app.route('/deposits', methods=['GET'])
 def get_deposits():
@@ -91,8 +85,8 @@ def get_config():
     return jsonify(Config().get())
 
 @app.route('/discounts/get', methods=['POST'])
-def get_discounts():
-    return jsonify(Discounts().get())
+def calculate_discounts():
+    return jsonify(Discounts().calculate_discounts())
 
 
 

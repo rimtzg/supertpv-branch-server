@@ -8,3 +8,4 @@ from methods.products import Methods as Products
 from methods.sales import Methods as Sales
 from methods.sessions import Methods as Sessions
 from methods.recharges import Recharges
+from methods.returns import Returns

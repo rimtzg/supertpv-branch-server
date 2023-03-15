@@ -31,59 +31,6 @@ class Methods():
 
         return cashier
 
-    def get_returns(self):
-        data = request.args
-
-        if(not data.get('session') ):
-            abort(403)
-
-        query = {
-            'session' : ObjectId(data['session'])
-        }
-
-        # print(query)
-
-        documents = mongo['returns'].find(query).sort([("date", 1)])
-
-        return list(documents)
-
-    def save_return(self):
-        data = request.json
-        args = request.args
-
-        if(not args.get('session') ):
-            abort(403)
-
-        if(not args.get('cashier') ):
-            abort(401)
-
-        _id = ObjectId()
-
-        data['sale'] = ObjectId(data['sale'])
-        data['_id'] = _id
-
-        data['date'] = datetime.utcnow()
-
-        data['session'] = ObjectId(args['session'])
-        data['cashier'] = ObjectId(args['cashier'])
-
-        number = mongo['returns'].find({"number" : { '$exists': True }}).count()+1
-
-        data['number'] = number
-
-        query = {
-            '_id' : _id
-        }
-
-        document = mongo['returns'].find_one_and_update(query, {'$set': data}, upsert=True, return_document=ReturnDocument.AFTER)
-
-        query_sale = {
-            '_id' : data['sale']
-        }
-        mongo['sales'].find_one_and_update(query_sale, {'$set': { 'returned' : True }})
-
-        return document
-
     def get_deposits(self):
         data = request.args
 

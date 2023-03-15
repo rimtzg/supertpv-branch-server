@@ -7,6 +7,8 @@ from pymongo import ReturnDocument
 
 from driver import mongo
 
+from schemas import Sales as SalesSchema
+
 class Methods():
     def get(self):
         args = request.args
@@ -24,7 +26,9 @@ class Methods():
         if not(document):
             abort(404)
 
-        return document
+        document['date'] = document['date'].isoformat()
+
+        return SalesSchema.validate(document)
 
     def list(self):
         data = request.args

@@ -6,10 +6,14 @@ from bson.objectid import ObjectId
 from driver import mongo
 
 class Methods():
-    def get(self):
+    def calculate_discounts(self):
         products = request.json
-        discounts = []
 
+        return self.calculate(products)
+
+    def calculate(self, products):
+        discounts = []
+        
         for product in products:
             if(product.get('volume_discount')):
                 _id = ObjectId(product['volume_discount'])

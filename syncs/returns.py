@@ -23,7 +23,7 @@ def sync_returns():
 
     while True:
         returns.upload_old()
-        # sales.upload()
+        returns.upload()
             
         sleep(DELAY)
 
@@ -107,3 +107,51 @@ class Returns():
                     return True
 
         return False
+
+    def upload(self):
+        server = app_config['API']['URL']
+        token = app_config['API']['TOKEN']
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        if(db and token):
+            query = {
+                'uploaded' : { '$ne' : True },
+            }
+
+            headers = {
+                'Token' : token,
+                'Content-Type' : 'application/json'
+            }
+
+            document = db.returns.find_one(query, sort=[("date", -1)])
+
+            if(document):
+                logging.info('SYNC NEW RETURN')
+
+                url = '{}/returns/{}'.format( server, document['_id'] )
+
+                data = DateTimeEncoder().encode(document)
+
+                response = None
+                try:
+                    response = requests.put(url, data=data, headers=headers)
+                except requests.exceptions.RequestException as err:
+                    logging.exception(err)
+
+                if(response and response.status_code == requests.codes.ok):
+
+                    query = {
+                        '_id' : document['_id']
+                    }
+
+                    data = {
+                        '$set' : {'uploaded' : True}
+                    }
+
+                    db.returns.find_one_and_update(query, data)
+
+                    return True
