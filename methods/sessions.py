@@ -113,6 +113,15 @@ class Methods():
             'cashier_id' : ObjectId(data['cashier']),
         }
 
+        if(data.get('start') and data.get('end')):
+            start = datetime.strptime(data['start'], '%Y-%m-%d').replace(hour=0, minute=0, second=0)
+            end = datetime.strptime(data['end'], '%Y-%m-%d').replace(hour=23, minute=59, second=59)
+
+            query['start_date'] = {
+                '$gte' : start,
+                '$lt' : end
+            }
+
         sessions = list(mongo['sessions'].find( query ).limit(10).sort([("start_date", -1)]))
 
         for session in sessions:
