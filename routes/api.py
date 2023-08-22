@@ -9,6 +9,7 @@ from routes.sessions import app as sessions
 from routes.sales import app as sales
 from routes.recharges import app as recharges
 from routes.returns import app as returns
+from routes.orders import app as orders
 
 PREFIX = 'api'
 
@@ -17,6 +18,7 @@ app.register_blueprint(sessions)
 app.register_blueprint(sales)
 app.register_blueprint(recharges)
 app.register_blueprint(returns)
+app.register_blueprint(orders)
 
 @app.route('/', methods=['GET'])
 def api():
@@ -75,10 +77,6 @@ def get_product():
 @app.route('/products', methods=['GET'])
 def get_products():
     return jsonify(Methods().get_products())
-
-@app.route('/orders', methods=['GET'])
-def get_orders():
-    return jsonify(Methods().get_orders())
 
 @app.route('/config', methods=['GET'])
 def get_config():

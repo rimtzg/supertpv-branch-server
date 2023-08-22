@@ -4,3 +4,4 @@ from routes.admin import app as admin
 from routes.api import app as api
 from routes.cashiers import app as cashiers
 from routes.products import app as products
+from routes.orders import app as orders

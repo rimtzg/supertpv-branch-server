@@ -6,7 +6,7 @@ class Base():
     def list(self):
         documents = mongo[self.COLLECTION].find({})
 
-        return documents
+        return list(documents)
 
     def get(self, _id):
         _id = ObjectId(_id)

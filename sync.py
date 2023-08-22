@@ -18,7 +18,6 @@ from schemas.discounts import schema as discount_schema
 from schemas.volume_discounts import schema as schema_volume_discount
 from schemas.cashiers import schema as schema_cashier
 from schemas.sessions import schema as schema_session
-from schemas.orders import schema as schema_order
 
 import pytz
 local_time = pytz.timezone("America/Mexico_City")
