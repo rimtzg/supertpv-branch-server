@@ -54,8 +54,8 @@ class Methods():
 
         documents = list(mongo['sales'].find(query).sort(sort))
 
-        for document in documents:
-            document['products'] = self.fit_products(document['products'])
+        # for document in documents:
+        #     document['products'] = self.fit_products(document['products'])
 
         return documents
 
@@ -122,7 +122,7 @@ class Methods():
 
                 mongo['card_payments'].insert(data)
 
-        document['products'] = self.fit_products(document['products'])
+        # document['products'] = self.fit_products(document['products'])
 
         return document
 
