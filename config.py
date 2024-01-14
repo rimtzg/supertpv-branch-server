@@ -18,6 +18,10 @@ FILE = os.path.join( DIRECTORY, INI )
 app_config = configparser.ConfigParser()
 app_config.read( FILE )
 
+app_config['FIX'] = {
+    'CARD_PAYMENTS' : 'False'
+}
+
 def save_config_file():
     with open( FILE , 'w') as configfile:
         app_config.write(configfile)

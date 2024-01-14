@@ -51,7 +51,7 @@ class Recharges():
                 'Content-Type' : 'application/json'
             }
 
-            document = db.Recharges.find_one(query, sort=[("date", -1)])
+            document = db.recharges.find_one(query, sort=[("date", -1)])
 
             if(document):
 
@@ -61,10 +61,10 @@ class Recharges():
                     'amount'        : document['amount'],
                     'number'        : document['number'],
                     'date'          : document['date'],
-                    'cashier_id'    : document['user_id'],
-                    'cashier_name'  : document['name'],
+                    'cashier_id'    : document['cashier_id'],
+                    'cashier_name'  : document['cashier_name'],
                     'session'       : document['session'],
-                    'sale'          : document['sale_id'],
+                    'sale'          : document['sale'],
                     'info'          : document['info'],
                     'status'        : document['status']
                 }

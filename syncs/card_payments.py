@@ -12,7 +12,7 @@ local_time = pytz.timezone("America/Mexico_City")
 from bson.objectid import ObjectId
 
 from driver import mongo
-from config import app_config
+from config import app_config, save_config_file
 
 def sync_card_payments():
     logging.info('START SYNC CARD PAYMENTS')
@@ -20,6 +20,9 @@ def sync_card_payments():
     DELAY = int(app_config['API']['DELAY'])
 
     card_payments = CardPayments()
+    
+    if not(app_config.getboolean('FIX', 'CARD_PAYMENTS')):
+        card_payments.fix()
 
     while True:
         card_payments.upload()
@@ -35,6 +38,22 @@ class DateTimeEncoder(JSONEncoder):
                 return str(obj)
 
 class CardPayments():
+    def fix(self):
+        logging.info('Card Payments fix')
+
+        try:
+            db = mongo
+        except:
+            db = None
+
+        if(db):
+            is_ok = db.card_payments.update_many({}, {'$set' : {'uploaded' : False}})
+
+            app_config['FIX']['CARD_PAYMENTS'] = 'True'
+
+            save_config_file()
+
+
     def upload(self):
         server = app_config['API']['URL']
         token = app_config['API']['TOKEN']
@@ -59,30 +78,31 @@ class CardPayments():
             if(card_payment):
                 logging.info('SYNC NEW SALE')
 
-                card_payment['session_id'] = card_payment['session']
+                if(card_payment.get('session')):
+                    card_payment['session_id'] = card_payment['session']
 
-                url = '{}/card_payments/{}'.format( server, card_payment['_id'] )
+                    url = '{}/card_payments/{}'.format( server, card_payment['_id'] )
 
-                data = DateTimeEncoder().encode(card_payment)
+                    data = DateTimeEncoder().encode(card_payment)
 
-                response = None
-                try:
-                    response = requests.put(url, data=data, headers=headers)
-                except requests.exceptions.RequestException as err:
-                    logging.exception(err)
+                    response = None
+                    try:
+                        response = requests.put(url, data=data, headers=headers)
+                    except requests.exceptions.RequestException as err:
+                        logging.exception(err)
 
-                if(response and response.status_code == requests.codes.ok):
+                    if(response and response.status_code == requests.codes.ok):
 
-                    query = {
-                        '_id' : card_payment['_id']
-                    }
+                        query = {
+                            '_id' : card_payment['_id']
+                        }
 
-                    data = {
-                        '$set' : {'uploaded' : True}
-                    }
+                        data = {
+                            '$set' : {'uploaded' : True}
+                        }
 
-                    db.card_payments.find_one_and_update(query, data)
+                        db.card_payments.find_one_and_update(query, data)
 
-                    return True
+                        return True
 
         return False
