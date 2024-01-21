@@ -54,8 +54,8 @@ class Methods():
 
         documents = list(mongo['sales'].find(query).sort(sort))
 
-        # for document in documents:
-        #     document['products'] = self.fit_products(document['products'])
+        for document in documents:
+            document['products'] = self.fit_products(document['products'])
 
         return documents
 
@@ -122,7 +122,7 @@ class Methods():
 
                 mongo['card_payments'].insert(data)
 
-        # document['products'] = self.fit_products(document['products'])
+        document['products'] = self.fit_products(document['products'])
 
         return document
 
@@ -131,31 +131,16 @@ class Methods():
         list_products = []
         for product in products:
 
-            is_in = False
-            for prod in list_products:
-                if(product['code'] == prod['code']):
-                    is_in = True
+            matches = [prod for prod in list_products if product['_id'] == prod['_id']]
 
-            if(is_in):
-                if(product.get('amount')):
-                    if(product['amount'] == '.'):
-                        product['amount'] = 0
+            try:
+                index = list_products.index(matches[0])
+            except:
+                index = None
 
-                    if(prod['amount'] == '.'):
-                        prod['amount'] = 0
-
-
-                    try:
-                        prod['amount'] = float(prod['amount']) + float(product['amount'])
-                    except:
-                        prod['amount'] = 0
-
-                if(product.get('subtotal')):
-                    if not(prod.get('subtotal')):
-                        prod['subtotal'] = 0
-
-                    prod['subtotal'] = float(prod['subtotal']) + float(product['subtotal'])
+            if not matches:
+                list_products.append(product.copy())
             else:
-                list_products.append(product)
+                list_products[index]['amount'] += product['amount']
 
         return list_products

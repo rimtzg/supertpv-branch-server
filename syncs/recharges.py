@@ -89,7 +89,7 @@ class Recharges():
                         '$set' : {'uploaded' : True}
                     }
 
-                    db.Recharges.find_one_and_update(query, data)
+                    db.recharges.find_one_and_update(query, data)
 
                     return True
 
