@@ -309,7 +309,7 @@ class Methods():
         if(not data.get('code') ):
             abort(404)
 
-        match = re.match('(.*)\*(.*)', data['code'])
+        match = re.match('(.*)\\*(.*)', data['code'])
         try:
             amount = float(match.groups()[0])
             if(amount < 0):
