@@ -62,13 +62,13 @@ class Deposits():
 
                 deposit['session_id'] = deposit['session']
 
-                url = '{}/deposits/{}'.format( server, deposit['_id'] )
+                url = '{}/deposits/save?id={}'.format( server, deposit['_id'] )
 
                 data = DateTimeEncoder().encode(deposit)
 
                 response = None
                 try:
-                    response = requests.put(url, data=data, headers=headers)
+                    response = requests.post(url, data=data, headers=headers)
                 except requests.exceptions.RequestException as err:
                     logging.exception(err)
 

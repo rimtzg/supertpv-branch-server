@@ -69,7 +69,7 @@ class Recharges():
                     'status'        : document['status']
                 }
 
-                url = '{}/recharges/{}'.format( server, recharge['_id'] )
+                url = '{}/recharges/save?id={}'.format( server, recharge['_id'] )
 
                 data = DateTimeEncoder().encode(recharge)
 

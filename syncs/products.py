@@ -25,10 +25,10 @@ def sync_products():
     products = Products()
 
     products.get()
-    products.deleted()
-    products.prices()
-    products.discounts()
-    products.stock()
+    # products.deleted()
+    # products.prices()
+    # products.discounts()
+    # products.stock()
     
     sleep(DELAY)
 
@@ -65,9 +65,9 @@ class Products():
 
         if(db and token):
             if(date):
-                url = '{}/products/?modified={}'.format( server, date )
+                url = '{}/products/branch?active=true&modified={}'.format( server, date )
             else:
-                url = '{}/products/'.format( server )
+                url = '{}/products/branch?active=true'.format( server )
 
             headers = {
                 'Token' : token

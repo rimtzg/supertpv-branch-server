@@ -82,7 +82,7 @@ class Returns():
                     'products'     : products,
                 }
 
-                url = '{}/returns/{}'.format( server, return_doc['_id'] )
+                url = '{}/returns/save?id={}'.format( server, return_doc['_id'] )
 
                 data = DateTimeEncoder().encode(data)
 

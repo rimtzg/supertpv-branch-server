@@ -63,7 +63,7 @@ class Sales():
 
                 sale['session_id'] = sale['session']
 
-                url = '{}/sales/{}'.format( server, sale['_id'] )
+                url = '{}/sales/save?id={}'.format( server, sale['_id'] )
 
                 data = DateTimeEncoder().encode(sale)
 

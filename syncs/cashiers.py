@@ -52,9 +52,9 @@ class Cashiers():
 
         if(db and token):
             if(date):
-                url = '{}/cashiers?modified={}'.format( server, date )
+                url = '{}/cashiers/list?active=true&modified={}'.format( server, date )
             else:
-                url = '{}/cashiers'.format( server )
+                url = '{}/cashiers/list?active=true'.format( server )
 
             headers = {
                 'Token' : token

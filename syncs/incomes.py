@@ -63,7 +63,7 @@ class Incomes():
 
                 income['session_id'] = income['session']
 
-                url = '{}/incomes/{}'.format( server, income['_id'] )
+                url = '{}/incomes/save?id={}'.format( server, income['_id'] )
 
                 data = DateTimeEncoder().encode(income)
 

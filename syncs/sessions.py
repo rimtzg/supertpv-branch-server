@@ -72,7 +72,7 @@ class Sessions():
                     session['cashier_id'] = session['cashier_id']
                     session['cashier_name'] = 'Sin nombre'
 
-                url = '{}/sessions/{}'.format( server, session['_id'] )
+                url = '{}/sessions/save?id={}'.format( server, session['_id'] )
 
                 data = DateTimeEncoder().encode(session)
 
@@ -250,7 +250,7 @@ class Sessions():
             if(session):
                 logging.info('SYNC ACTUAL SESSION')
 
-                url = '{}/sessions/{}'.format( server, session['_id'] )
+                url = '{}/sessions/save?id={}'.format( server, session['_id'] )
 
                 _id = session['_id']
 

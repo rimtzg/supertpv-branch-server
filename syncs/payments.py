@@ -62,7 +62,7 @@ class Payments():
 
                 payment['session_id'] = payment['session']
 
-                url = '{}/payments/{}'.format( server, payment['_id'] )
+                url = '{}/payments/save?id={}'.format( server, payment['_id'] )
 
                 data = DateTimeEncoder().encode(payment)
 

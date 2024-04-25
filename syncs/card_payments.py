@@ -81,13 +81,13 @@ class CardPayments():
                 if(card_payment.get('session')):
                     card_payment['session_id'] = card_payment['session']
 
-                    url = '{}/card_payments/{}'.format( server, card_payment['_id'] )
+                    url = '{}/card_payments/save?id={}'.format( server, card_payment['_id'] )
 
                     data = DateTimeEncoder().encode(card_payment)
 
                     response = None
                     try:
-                        response = requests.put(url, data=data, headers=headers)
+                        response = requests.post(url, data=data, headers=headers)
                     except requests.exceptions.RequestException as err:
                         logging.exception(err)
 
