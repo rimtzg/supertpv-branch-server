@@ -132,7 +132,7 @@ class Returns():
             if(document):
                 logging.info('SYNC NEW RETURN')
 
-                url = '{}/returns/{}'.format( server, document['_id'] )
+                url = '{}/returns/save?id={}'.format( server, document['_id'] )
 
                 data = DateTimeEncoder().encode(document)
 

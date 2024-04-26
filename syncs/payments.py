@@ -58,7 +58,7 @@ class Payments():
             payment = db.payments.find_one(query, sort=[("date", -1)])
 
             if(payment):
-                logging.info('SYNC NEW SALE')
+                logging.info('SYNC NEW PAYMENT')
 
                 payment['session_id'] = payment['session']
 

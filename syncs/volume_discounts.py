@@ -52,9 +52,9 @@ class VolumeDiscounts():
 
         if(db and token):
             if(date):
-                url = '{}/volume_discounts/list?active=true&modified={}'.format( server, date )
+                url = '{}/volume_discounts/branch?modified={}'.format( server, date )
             else:
-                url = '{}/volume_discounts/list?active=true'.format( server )
+                url = '{}/volume_discounts/branch?'.format( server )
 
             headers = {
                 'Token' : token
