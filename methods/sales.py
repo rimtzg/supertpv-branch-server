@@ -56,6 +56,7 @@ class Methods():
 
         for document in documents:
             document['products'] = self.fit_products(document['products'])
+            document['num_of_products'] = len(document['products'] )
 
         return documents
 
@@ -131,16 +132,27 @@ class Methods():
         list_products = []
         for product in products:
 
-            matches = [prod for prod in list_products if product['_id'] == prod['_id']]
+            matches = [prod for prod in list_products if str(product['_id']) == str(prod['_id'])]
 
             try:
                 index = list_products.index(matches[0])
             except:
                 index = None
 
+            if not(product.get('amount')):
+                product['amount'] = 0
+            if not(product.get('amount')):
+                product['subtotal'] = 0
+
             if not matches:
                 list_products.append(product.copy())
             else:
-                list_products[index]['amount'] += product['amount']
+                if not(list_products[index].get('amount')):
+                    list_products[index]['amount'] = 0
+                if not(list_products[index].get('amount')):
+                    list_products[index]['subtotal'] = 0
+
+                list_products[index]['amount'] += float(product['amount'])
+                list_products[index]['subtotal'] += float(product['subtotal'])
 
         return list_products

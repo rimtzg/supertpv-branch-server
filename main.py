@@ -102,47 +102,51 @@ from syncs import sync_deposits
 from syncs import sync_returns
 from syncs import sync_card_payments
 from syncs import sync_orders
+from syncs import sync_cash_withdrawals
 
 @app.before_first_request
 def first_start():
-    thread = threading.Thread(target=sync_config)
-    thread.start()
+    # thread = threading.Thread(target=sync_config)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_cashiers)
-    thread.start()
+    # thread = threading.Thread(target=sync_cashiers)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_products)
-    thread.start()
+    # thread = threading.Thread(target=sync_products)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_volume_discounts)
-    thread.start()
+    # thread = threading.Thread(target=sync_volume_discounts)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_recharges)
-    thread.start()
+    # thread = threading.Thread(target=sync_recharges)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_sessions)
-    thread.start()
+    # thread = threading.Thread(target=sync_sessions)
+    # thread.start()
 
     thread = threading.Thread(target=sync_sales)
     thread.start()
 
-    thread = threading.Thread(target=sync_payments)
-    thread.start()
+    # thread = threading.Thread(target=sync_payments)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_incomes)
-    thread.start()
+    # thread = threading.Thread(target=sync_incomes)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_deposits)
-    thread.start()
+    # thread = threading.Thread(target=sync_deposits)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_returns)
-    thread.start()
+    # thread = threading.Thread(target=sync_returns)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_card_payments)
-    thread.start()
+    # thread = threading.Thread(target=sync_card_payments)
+    # thread.start()
 
-    thread = threading.Thread(target=sync_orders)
-    thread.start()
+    # thread = threading.Thread(target=sync_orders)
+    # thread.start()
+
+    # thread = threading.Thread(target=sync_cash_withdrawals)
+    # thread.start()
 
     pass
 

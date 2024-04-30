@@ -11,3 +11,4 @@ from syncs.deposits import sync_deposits
 from syncs.returns import sync_returns
 from syncs.card_payments import sync_card_payments
 from syncs.orders import sync_orders
+from syncs.cash_withdrawals import sync_cash_withdrawals

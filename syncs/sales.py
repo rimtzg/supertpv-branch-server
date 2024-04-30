@@ -25,7 +25,7 @@ def sync_sales():
         sales.upload_old()
         sales.upload()
             
-        sleep(DELAY)
+        sleep(5)
 
 class DateTimeEncoder(JSONEncoder):
         #Override the default method

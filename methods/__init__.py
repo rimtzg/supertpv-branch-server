@@ -10,3 +10,4 @@ from methods.sessions import Methods as Sessions
 from methods.recharges import Recharges
 from methods.returns import Returns
 from methods.orders import Orders
+from methods.cash_withdrawals import CashWithdrawals

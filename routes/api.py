@@ -4,12 +4,14 @@ from methods.api import Methods
 from methods import Discounts
 from methods import Sales
 from methods import Config
+from methods import CashWithdrawals
 
 from routes.sessions import app as sessions
 from routes.sales import app as sales
 from routes.recharges import app as recharges
 from routes.returns import app as returns
 from routes.orders import app as orders
+from routes.cash_withdrawals import app as cash_withdrawals
 
 PREFIX = 'api'
 
@@ -19,6 +21,7 @@ app.register_blueprint(sales)
 app.register_blueprint(recharges)
 app.register_blueprint(returns)
 app.register_blueprint(orders)
+app.register_blueprint(cash_withdrawals)
 
 @app.route('/', methods=['GET'])
 def api():
@@ -61,15 +64,6 @@ def get_card_payments():
 def save_card_payment():
     return jsonify(Methods().save_card_payment())
 
-#CASH WITHDRAWALS
-@app.route('/cash_withdrawals', methods=['GET'])
-def get_cash_withdrawals():
-    return jsonify(Methods().get_cash_withdrawals())
-
-@app.route('/cash_withdrawals', methods=['POST'])
-def save_cash_withdrawal():
-    return jsonify(Methods().save_cash_withdrawal())
-
 @app.route('/product', methods=['GET'])
 def get_product():
     return jsonify(Methods().get_product())
@@ -87,5 +81,11 @@ def calculate_discounts():
     return jsonify(Discounts().calculate_discounts())
 
 
+#CASH WHITDRAWALS
+@app.route('/cash_withdrawals', methods=['GET'])
+def get_cash_withdrawals_bak():
+    return jsonify(CashWithdrawals().list())
 
-
+@app.route('/cash_withdrawals', methods=['POST'])
+def save_cash_withdrawals():
+    return jsonify(CashWithdrawals().save())
