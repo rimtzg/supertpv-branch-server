@@ -70,7 +70,7 @@ class Products():
                 url = '{}/products/branch?active=true'.format( server )
 
             headers = {
-                'Token' : token
+                'Authorization' : f"Bearer {token}"
             }
 
             response = None

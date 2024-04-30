@@ -16,8 +16,7 @@ def sync_cashiers():
     logging.info('START SYNC CASHIERS')
 
     DATE = datetime.utcnow().isoformat()
-    DELAY = int(app_config['API']['DELAY'])
-    DELAY_TIME = 0
+    DELAY = 120
 
     cashiers = Cashiers()
 
@@ -30,15 +29,7 @@ def sync_cashiers():
 
         DATE = datetime.utcnow().isoformat()
 
-        if(num == 0):
-            DELAY_TIME += DELAY
-        else:
-            DELAY_TIME = DELAY
-
-        if(DELAY_TIME > 120):
-            DELAY_TIME = 120
-
-        sleep(DELAY_TIME)
+        sleep(DELAY)
     
 class Cashiers():
     def get(self, date=None):
@@ -57,7 +48,7 @@ class Cashiers():
                 url = '{}/cashiers/branch'.format( server )
 
             headers = {
-                'Token' : token
+                'Authorization' : f"Bearer {token}"
             }
 
             response = None

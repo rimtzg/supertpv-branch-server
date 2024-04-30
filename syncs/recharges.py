@@ -14,7 +14,7 @@ from config import app_config
 def sync_recharges():
     logging.info('START SYNC RECHARGES')
 
-    DELAY = int(app_config['API']['DELAY'])
+    DELAY = 120
 
     recharges = Recharges()
 
@@ -47,7 +47,7 @@ class Recharges():
             }
 
             headers = {
-                'Token' : token,
+                'Authorization' : f"Bearer {token}",
                 'Content-Type' : 'application/json'
             }
 
@@ -75,7 +75,7 @@ class Recharges():
 
                 response = None
                 try:
-                    response = requests.put(url, data=data, headers=headers)
+                    response = requests.post(url, data=data, headers=headers)
                 except requests.exceptions.RequestException as err:
                     logging.exception(err)
 

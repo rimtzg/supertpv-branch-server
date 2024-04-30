@@ -41,7 +41,7 @@ class Orders():
             url = f'{server}/orders/list?start={date}'
 
             headers = {
-                'Token' : token
+                'Authorization' : f"Bearer {token}"
             }
 
             response = None

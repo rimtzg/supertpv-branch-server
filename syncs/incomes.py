@@ -52,7 +52,7 @@ class Incomes():
             }
 
             headers = {
-                'Token' : token,
+                'Authorization' : f"Bearer {token}",
                 'Content-Type' : 'application/json'
             }
 

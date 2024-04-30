@@ -36,7 +36,7 @@ class Config():
             url = '{}/branchs/config'.format( server )
 
             headers = {
-                'Token' : token
+                'Authorization' : f"Bearer {token}"
             }
 
             response = None

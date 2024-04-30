@@ -17,12 +17,9 @@ from config import app_config, save_config_file
 def sync_card_payments():
     logging.info('START SYNC CARD PAYMENTS')
 
-    DELAY = int(app_config['API']['DELAY'])
+    DELAY = 120
 
     card_payments = CardPayments()
-    
-    if not(app_config.getboolean('FIX', 'CARD_PAYMENTS')):
-        card_payments.fix()
 
     while True:
         card_payments.upload()
@@ -38,22 +35,6 @@ class DateTimeEncoder(JSONEncoder):
                 return str(obj)
 
 class CardPayments():
-    def fix(self):
-        logging.info('Card Payments fix')
-
-        try:
-            db = mongo
-        except:
-            db = None
-
-        if(db):
-            is_ok = db.card_payments.update_many({}, {'$set' : {'uploaded' : False}})
-
-            app_config['FIX']['CARD_PAYMENTS'] = 'True'
-
-            save_config_file()
-
-
     def upload(self):
         server = app_config['API']['URL']
         token = app_config['API']['TOKEN']
@@ -69,7 +50,7 @@ class CardPayments():
             }
 
             headers = {
-                'Token' : token,
+                'Authorization' : f"Bearer {token}",
                 'Content-Type' : 'application/json'
             }
 
