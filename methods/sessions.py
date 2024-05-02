@@ -86,14 +86,24 @@ class Methods():
 
         data = {
             'initial_money' :           session['initial_money'],
+            
             'total_sales' :             session['total_sales'],
-            'num_of_sales' :            session['num_of_sales'],
             'total_incomes' :           session['total_incomes'],
             'total_payments' :          session['total_payments'],
             'total_deposits' :          session['total_deposits'],
             'total_returns' :           session['total_returns'],
             'total_card_payments' :     session['total_card_payments'],
             'total_cash_withdrawals' :  session['total_cash_withdrawals'],
+
+            'num_of_sales' :            session['num_of_sales'],
+            'num_of_sales' :            session['num_of_sales'],
+            'num_of_returns' :          session['num_of_returns'],
+            'num_of_payments' :         session['num_of_payments'],
+            'num_of_incomes' :          session['num_of_incomes'],
+            'num_of_deposits' :         session['num_of_deposits'],
+            'num_of_card_payments' :    session['num_of_card_payments'],
+            'num_of_cash_withdrawals' : session['num_of_cash_withdrawals'],
+
             'difference' :              session['difference'],
             'end_date' :                datetime.utcnow(),
             'closed' :                  True
@@ -159,14 +169,23 @@ class Methods():
         session['cash_withdrawals'] = cash_withdrawals
 
         session['initial_money'] = session['initial_money']
+
         session['total_sales'] = self.get_total_sales(sales)
-        session['num_of_sales'] = len(sales)
         session['total_incomes'] = self.get_total_incomes(incomes)
         session['total_payments'] = self.get_total_payments(payments)
         session['total_deposits'] = self.get_total_deposits(deposits)
         session['total_returns'] = self.get_total_returns(returns)
         session['total_card_payments'] = self.get_total_card_payments(card_payments)
         session['total_cash_withdrawals'] = self.get_total_cash_withdrawals(cash_withdrawals)
+
+        session['num_of_sales'] = len(sales)
+        session['num_of_returns'] = len(returns)
+        session['num_of_payments'] = len(payments)
+        session['num_of_incomes'] = len(incomes)
+        session['num_of_deposits'] = len(deposits)
+        session['num_of_card_payments'] = len(card_payments)
+        session['num_of_cash_withdrawals'] = len(cash_withdrawals)
+
         session['difference'] = self.calculate_difference(session)
         session['end_date'] = session['end_date'] if session.get('end_date') else datetime.utcnow()
         session['closed'] = session['closed'] if session.get('closed') else False

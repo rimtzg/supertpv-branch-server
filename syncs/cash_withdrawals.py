@@ -69,13 +69,13 @@ class CashWithdrawals():
                 #     'status'        : document['status']
                 # }
 
-                url = '{}/cash_withdrawals/{}'.format( server, document['_id'] )
+                url = '{}/cash_withdrawals/save?id={}'.format( server, document['_id'] )
 
                 data = DateTimeEncoder().encode(document)
 
                 response = None
                 try:
-                    response = requests.put(url, data=data, headers=headers)
+                    response = requests.post(url, data=data, headers=headers)
                 except requests.exceptions.RequestException as err:
                     logging.exception(err)
 

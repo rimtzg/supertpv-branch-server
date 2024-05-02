@@ -121,8 +121,8 @@ def first_start():
     thread = threading.Thread(target=sync_recharges)
     thread.start()
 
-    # thread = threading.Thread(target=sync_sessions)
-    # thread.start()
+    thread = threading.Thread(target=sync_sessions)
+    thread.start()
 
     # thread = threading.Thread(target=sync_sales)
     # thread.start()
