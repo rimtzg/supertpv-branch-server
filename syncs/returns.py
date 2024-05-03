@@ -17,12 +17,11 @@ from config import app_config
 def sync_returns():
     logging.info('START SYNC RETURNS')
 
-    DELAY = int(app_config['API']['DELAY'])
+    DELAY = 120
 
     returns = Returns()
 
     while True:
-        returns.upload_old()
         returns.upload()
             
         sleep(DELAY)
@@ -67,7 +66,7 @@ class Returns():
 
                 response = None
                 try:
-                    response = requests.put(url, data=data, headers=headers)
+                    response = requests.post(url, data=data, headers=headers)
                 except requests.exceptions.RequestException as err:
                     logging.exception(err)
 

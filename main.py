@@ -127,17 +127,17 @@ def first_start():
     # thread = threading.Thread(target=sync_sales)
     # thread.start()
 
-    # thread = threading.Thread(target=sync_payments)
-    # thread.start()
+    thread = threading.Thread(target=sync_payments)
+    thread.start()
 
-    # thread = threading.Thread(target=sync_incomes)
-    # thread.start()
+    thread = threading.Thread(target=sync_incomes)
+    thread.start()
 
-    # thread = threading.Thread(target=sync_deposits)
-    # thread.start()
+    thread = threading.Thread(target=sync_deposits)
+    thread.start()
 
-    # thread = threading.Thread(target=sync_returns)
-    # thread.start()
+    thread = threading.Thread(target=sync_returns)
+    thread.start()
 
     thread = threading.Thread(target=sync_card_payments)
     thread.start()

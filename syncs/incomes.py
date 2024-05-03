@@ -17,14 +17,12 @@ from config import app_config
 def sync_incomes():
     logging.info('START SYNC INCOMES')
 
-    DELAY = int(app_config['API']['DELAY'])
+    DELAY = 120
 
     incomes = Incomes()
 
     while True:
-        incomes.upload_old()
         incomes.upload()
-        # sales.upload()
             
         sleep(DELAY)
 
@@ -69,7 +67,7 @@ class Incomes():
 
                 response = None
                 try:
-                    response = requests.put(url, data=data, headers=headers)
+                    response = requests.post(url, data=data, headers=headers)
                 except requests.exceptions.RequestException as err:
                     logging.exception(err)
 
@@ -86,82 +84,5 @@ class Incomes():
                     db.incomes.find_one_and_update(query, data)
 
                     return True
-
-        return False
-
-    def upload_old(self):
-        server = app_config['API']['URL']
-        token = app_config['API']['TOKEN']
-
-        try:
-            db = mongo
-        except:
-            db = None
-
-        if(db and token):
-            query = {
-                'uploaded' : { '$ne' : True },
-                'type' : 'in'
-            }
-
-            headers = {
-                'Token' : token,
-                'Content-Type' : 'application/json'
-            }
-
-            income = db.MoneyMovements.find_one(query, sort=[("date", -1)])
-
-            # print(income)
-
-            if(income):
-                logging.info('SYNC OLD INCOME')
-
-                session = db.Sessions.find_one({ '_id' : income['session'] })
-
-                if(session):
-                    # print(session)
-
-                    cashier = db.cashiers.find_one({ '_id' : session['user_id'] })
-
-                    # print(cashier)
-                    if not(cashier):
-                        cashier = {
-                            '_id' : ObjectId(),
-                            'name' : 'Cajero sin nombre'
-                        }
-
-                    data = {
-                        'cashier_id'   : cashier['_id'],
-                        'cashier_name' : cashier['name'],
-                        'cashier'      : cashier['_id'],
-                        'session_id'   : session['_id'],
-                        'date'         : local_time.localize(income['date'], is_dst=None).astimezone(pytz.utc),
-                        'amount'       : income['amount'],
-                        'reason'       : income['razon'],
-                    }
-
-                    url = '{}/incomes/{}'.format( server, income['_id'] )
-
-                    data = DateTimeEncoder().encode(data)
-
-                    response = None
-                    try:
-                        response = requests.put(url, data=data, headers=headers)
-                    except requests.exceptions.RequestException as err:
-                        logging.exception(err)
-
-                    if(response and response.status_code == requests.codes.ok):
-
-                        query = {
-                            '_id' : income['_id']
-                        }
-
-                        data = {
-                            '$set' : {'uploaded' : True}
-                        }
-
-                        db.MoneyMovements.find_one_and_update(query, data)
-
-                        return True
 
         return False
