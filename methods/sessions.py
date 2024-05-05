@@ -246,7 +246,7 @@ class Methods():
         return total_cash_withdrawals
 
     def calculate_difference(self, session):
-        print(session)
+        #print(session)
 
         difference = 0
         total_deposits = session['total_deposits']

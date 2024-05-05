@@ -19,13 +19,12 @@ def sync_products():
     logging.info('START SYNC PRODUCTS')
 
     DATE = datetime.utcnow().isoformat()
-    DELAY = int(app_config['API']['DELAY'])
-    DELAY_TIME = 0
+    DELAY = 120
 
     products = Products()
 
     products.get()
-    # products.deleted()
+    products.deleted()
     # products.prices()
     # products.discounts()
     # products.stock()
@@ -33,25 +32,25 @@ def sync_products():
     sleep(DELAY)
 
     while True:
-        num = products.get(DATE)
+        products.get(DATE)
         products.deleted()
 
-        if(num > 0):
-            products.prices()
-            products.discounts()
-            products.stock()
+        # if(num > 0):
+        #     products.prices()
+        #     products.discounts()
+        #     products.stock()
 
         DATE = datetime.utcnow().isoformat()
 
-        if(num == 0):
-            DELAY_TIME += DELAY
-        else:
-            DELAY_TIME = DELAY
+        # if(num == 0):
+        #     DELAY_TIME += DELAY
+        # else:
+        #     DELAY_TIME = DELAY
 
-        if(DELAY_TIME > 120):
-            DELAY_TIME = 120
+        # if(DELAY_TIME > 120):
+        #     DELAY_TIME = 120
 
-        sleep(DELAY_TIME)
+        sleep(DELAY)
     
 class Products():
     def get(self, date=None):
@@ -65,9 +64,9 @@ class Products():
 
         if(db and token):
             if(date):
-                url = '{}/products/branch?active=true&modified={}'.format( server, date )
+                url = '{}/products/branch?modified={}'.format( server, date )
             else:
-                url = '{}/products/branch?active=true'.format( server )
+                url = '{}/products/branch'.format( server )
 
             headers = {
                 'Authorization' : f"Bearer {token}"
@@ -113,10 +112,10 @@ class Products():
             db = None
 
         if(db and token):
-            url = '{}/products/?deleted=True'.format( server )
+            url = '{}/products/deleted'.format( server )
 
             headers = {
-                'Token' : token
+                'Authorization' : f"Bearer {token}"
             }
 
             response = None
@@ -137,125 +136,3 @@ class Products():
                     }
 
                     db.products.delete_one(query)
-
-    def prices(self):
-        server = app_config['API']['URL']
-        token = app_config['API']['TOKEN']
-
-        try:
-            db = mongo
-        except:
-            db = None
-
-        if(db and token):
-            url = '{}/prices/branch'.format( server )
-
-            headers = {
-                'Token' : token
-            }
-
-            response = None
-            try:
-                response = requests.get(url, headers=headers)
-            except requests.exceptions.RequestException as err:
-                logging.exception(err)
-
-            if(response and response.status_code == requests.codes.ok):
-
-                prices = json.loads(response.text)
-                logging.info('PRICES: {}'.format( len(prices) ))
-
-                for price in prices:
-                    if(price.get('product_id')):
-
-                        query = {
-                            '_id' : ObjectId( price['product_id'] )
-                        }
-
-                        data = {
-                            '$set' : price_schema.validate(price)
-                        }
-
-                        db.products.find_one_and_update(query, data)
-
-    def discounts(self):
-        server = app_config['API']['URL']
-        token = app_config['API']['TOKEN']
-
-        try:
-            db = mongo
-        except:
-            db = None
-
-        if(db and token):
-            url = '{}/discounts/branch'.format( server )
-
-            headers = {
-                'Token' : token
-            }
-
-            response = None
-            try:
-                response = requests.get(url, headers=headers)
-            except requests.exceptions.RequestException as err:
-                logging.exception(err)
-
-            if(response and response.status_code == requests.codes.ok):
-
-                discounts = json.loads(response.text)
-                logging.info('DISCOUNTS: {}'.format( len(discounts) ))
-
-                for discount in discounts:
-                    if(discount.get('product_id') and discount.get('volume_discount_id')):
-
-                        query = {
-                            '_id' : ObjectId( discount['product_id'] )
-                        }
-
-                        data = {
-                            '$set' : {
-                                'volume_discount' : ObjectId(discount['volume_discount_id'])
-                            }
-                        }
-
-                        db.products.find_one_and_update(query, data)
-
-    def stock(self):
-        server = app_config['API']['URL']
-        token = app_config['API']['TOKEN']
-
-        try:
-            db = mongo
-        except:
-            db = None
-
-        if(db and token):
-            url = '{}/stock/branch'.format( server )
-
-            headers = {
-                'Token' : token
-            }
-
-            response = None
-            try:
-                response = requests.get(url, headers=headers)
-            except requests.exceptions.RequestException as err:
-                logging.exception(err)
-
-            if(response and response.status_code == requests.codes.ok):
-
-                stocks = json.loads(response.text)
-                logging.info('STOCK: {}'.format( len(stocks) ))
-
-                for stock in stocks:
-                    if(stock.get('product')):
-
-                        query = {
-                            '_id' : ObjectId( stock['product'] )
-                        }
-
-                        data = {
-                            '$set' : stock_schema.validate(stock)
-                        }
-
-                        db.products.find_one_and_update(query, data)

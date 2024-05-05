@@ -106,17 +106,17 @@ from syncs import sync_cash_withdrawals
 
 @app.before_first_request
 def first_start():
-    # thread = threading.Thread(target=sync_config)
-    # thread.start()
+    thread = threading.Thread(target=sync_config)
+    thread.start()
 
     thread = threading.Thread(target=sync_cashiers)
     thread.start()
 
-    # thread = threading.Thread(target=sync_products)
-    # thread.start()
+    thread = threading.Thread(target=sync_products)
+    thread.start()
 
-    # thread = threading.Thread(target=sync_volume_discounts)
-    # thread.start()
+    thread = threading.Thread(target=sync_volume_discounts)
+    thread.start()
 
     thread = threading.Thread(target=sync_recharges)
     thread.start()
@@ -124,8 +124,8 @@ def first_start():
     thread = threading.Thread(target=sync_sessions)
     thread.start()
 
-    # thread = threading.Thread(target=sync_sales)
-    # thread.start()
+    thread = threading.Thread(target=sync_sales)
+    thread.start()
 
     thread = threading.Thread(target=sync_payments)
     thread.start()
@@ -145,8 +145,8 @@ def first_start():
     # thread = threading.Thread(target=sync_orders)
     # thread.start()
 
-    # thread = threading.Thread(target=sync_cash_withdrawals)
-    # thread.start()
+    thread = threading.Thread(target=sync_cash_withdrawals)
+    thread.start()
 
     pass
 
