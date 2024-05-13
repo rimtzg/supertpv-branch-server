@@ -16,11 +16,12 @@ def sync_config():
     logging.info('START SYNC CONFIG')
 
     config = Config()
+    config.get()
 
-    while True:
-        config.get()
+    # while True:
+    #     config.get()
 
-        sleep(120)
+    #     sleep(120)
     
 class Config():
     def get(self):

@@ -14,7 +14,7 @@ from config import app_config
 def sync_cash_withdrawals():
     logging.info('START SYNC CASH WITHDRAWLS')
 
-    DELAY = int(app_config['API']['DELAY'])
+    DELAY = 120
 
     cash_withdrawals = CashWithdrawals()
 
@@ -54,20 +54,6 @@ class CashWithdrawals():
             document = db.cash_withdrawals.find_one(query, sort=[("date", -1)])
 
             if(document):
-
-                # cash_withdrawl = {
-                #     '_id'           : document['_id'],
-                #     'company'       : document['company'],
-                #     'amount'        : document['amount'],
-                #     'number'        : document['number'],
-                #     'date'          : document['date'],
-                #     'cashier_id'    : document['cashier_id'],
-                #     'cashier_name'  : document['cashier_name'],
-                #     'session'       : document['session'],
-                #     'sale'          : document['sale'],
-                #     'info'          : document['info'],
-                #     'status'        : document['status']
-                # }
 
                 url = '{}/cash_withdrawals/save?id={}'.format( server, document['_id'] )
 

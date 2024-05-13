@@ -16,8 +16,7 @@ def sync_volume_discounts():
     logging.info('START SYNC VOLUME DISCOUNTS')
 
     DATE = datetime.utcnow().isoformat()
-    DELAY = int(app_config['API']['DELAY'])
-    DELAY_TIME = 0
+    DELAY = 120
 
     volume_discounts = VolumeDiscounts()
 
@@ -30,15 +29,11 @@ def sync_volume_discounts():
 
         DATE = datetime.utcnow().isoformat()
 
-        if(num == 0):
-            DELAY_TIME += DELAY
-        else:
-            DELAY_TIME = DELAY
+        DELAY += 5
+        if(num > 0):
+            DELAY = 120
 
-        if(DELAY_TIME > 120):
-            DELAY_TIME = 120
-
-        sleep(DELAY_TIME)
+        sleep(DELAY)
     
 class VolumeDiscounts():
     def get(self, date=None):

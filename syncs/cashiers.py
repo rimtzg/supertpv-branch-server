@@ -29,6 +29,10 @@ def sync_cashiers():
 
         DATE = datetime.utcnow().isoformat()
 
+        DELAY += 5
+        if(num > 0):
+            DELAY = 120
+
         sleep(DELAY)
     
 class Cashiers():

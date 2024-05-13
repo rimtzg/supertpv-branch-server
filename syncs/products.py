@@ -25,30 +25,19 @@ def sync_products():
 
     products.get()
     products.deleted()
-    # products.prices()
-    # products.discounts()
-    # products.stock()
     
     sleep(DELAY)
 
     while True:
-        products.get(DATE)
-        products.deleted()
-
-        # if(num > 0):
-        #     products.prices()
-        #     products.discounts()
-        #     products.stock()
-
+        num = products.get(DATE)
+        
         DATE = datetime.utcnow().isoformat()
 
-        # if(num == 0):
-        #     DELAY_TIME += DELAY
-        # else:
-        #     DELAY_TIME = DELAY
+        DELAY += 5
+        if(num > 0):
+            DELAY = 120
 
-        # if(DELAY_TIME > 120):
-        #     DELAY_TIME = 120
+            products.deleted()
 
         sleep(DELAY)
     
