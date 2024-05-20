@@ -24,8 +24,6 @@ def sync_sessions():
     while True:
         sessions.upload()
         sessions.upload_actual()
-
-        DELAY += 5
             
         sleep(DELAY)
 

@@ -33,10 +33,7 @@ def sync_products():
         
         DATE = datetime.utcnow().isoformat()
 
-        DELAY += 5
         if(num > 0):
-            DELAY = 120
-
             products.deleted()
 
         sleep(DELAY)
